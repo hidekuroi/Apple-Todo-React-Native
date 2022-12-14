@@ -1,84 +1,62 @@
+import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableNativeFeedback, TouchableOpacity, TouchableHighlight, Button, TextInput, Alert } from 'react-native';
-import { Provider, useDispatch } from 'react-redux';
-import Navbar from './src/Navbar';
-import { store } from './src/reducers';
-import { setAuthUser } from './src/reducers/AuthReducer';
+import { useEffect } from 'react';
+import { Alert, Button, StyleSheet, useColorScheme, View } from 'react-native';
+import { Provider } from 'react-redux';
+import { useAppDispatch } from './src/hooks/useAppDispatch';
+import { useTypedSelector } from './src/hooks/useTypedSelector';
+import { authCheck, signOut } from './src/reducers/AuthReducer';
+import { store } from './src/reducers/store';
+import Auth from './src/screens/Auth';
+import Todos from './src/screens/Todos';
 
 const Main = () => {
 
-  const dispatch = useDispatch()
-  const [value, setValue] = useState<string>('')
-  const [error, setError] = useState<boolean>(false)
+  const {login, isAuth} = useTypedSelector(state => state.auth)
 
-  const AuthPrompt = () => 
-    Alert.prompt('Enter password', 'Enter \"dixon\" password to display username in navbar.',
-    [
-      {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel'
-      },
-      {
-        text: 'OK',
-        onPress: (password) =>
-          {
-            if(password === 'dixon') authUser()
-            else alert('Долбоеб, правильно напиши.')
-          }
-      }
-    ], 'secure-text'
-    )
+  const Stack = createNativeStackNavigator();
 
-  const TestAlert = () => 
-    Alert.alert('Signed Out', 'You have been signed out',
+  const dispatch = useAppDispatch()
+  useEffect(() => {
+    dispatch(authCheck())
+  }, [])
+
+    const TestAlert = () => 
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?',
       [
         {
           text: 'Cancel',
           onPress: () => console.log('Cancel pressed'),
-          style: 'destructive'
+          style: 'cancel'
         },
         {
-          text: 'Ok',
-          onPress: () => console.log('Ok pressed'),
-          style: 'default'
+          text: 'Sign Out',
+          onPress: () => signOutHandler(),
+          style: 'destructive'
         },
-      ], {cancelable: true, userInterfaceStyle: 'light'}
+      ], {cancelable: true}
     )
 
-  const authUser = () => {
-    dispatch(setAuthUser('shit@poop.com', value))
-
-    setValue('')
+  const signOutHandler = () => {
+    dispatch(signOut())
   }
 
-  const handlePress2 = () => {
-    dispatch(setAuthUser('', ''))
-    TestAlert()
+  if(isAuth) {
+    return(
+      <Stack.Navigator initialRouteName='Todos'>
+        <Stack.Screen name="Todos" component={Todos} options={{ title: login, headerLeft: () => (<Button onPress={TestAlert} color={'red'} title='Sign Out'/>) }} />
+      </Stack.Navigator>
+    )
+  }
+  else {
+    return(
+      <Stack.Navigator initialRouteName='Auth'>
+        <Stack.Screen name="Auth" component={Auth} />
+      </Stack.Navigator>
+    )
   }
 
-  return(
-    <View style={styles.container}>
-        <Navbar />
-        <View>
-          <View style={{paddingHorizontal: '20%', marginTop: 50}}>
-            <TextInput value={value} onChangeText={setValue}
-             placeholder={error ? 'Enter correct username' : 'Username'} placeholderTextColor={error && !value.length ? 'red' : 'lightgray'} style={error ? styles.errorInput : styles.input} />
-            <Button title='LOGIN' onPress={() => {
-              if(value.length > 0) {
-                setError(false)
-                AuthPrompt()
-              }
-              else setError(true)
-            }}/>
-            <Button title='SIGN OUT' onPress={handlePress2} color={'rgb(240, 0, 0)'} />
-          </View>
-        </View>
-
-        <StatusBar style="light" />
-      </View>
-  )
 }
 
 
@@ -87,9 +65,12 @@ const Main = () => {
 
 
 export default function App() {
+  const scheme = useColorScheme();
   return (
     <Provider store={store}>
-      <Main />
+      <NavigationContainer theme={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Main />
+      </NavigationContainer>
     </Provider> 
   );
 }
@@ -101,6 +82,4 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
     // justifyContent: 'center',
   },
-  input: {borderStyle: 'solid', borderWidth: 1, borderColor: 'lightgray', borderRadius: 5, padding: 10},
-  errorInput: {borderStyle: 'solid', borderWidth: 1, borderColor: 'red', borderRadius: 5, padding: 10}
 });

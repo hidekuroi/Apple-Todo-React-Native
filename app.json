@@ -1,11 +1,13 @@
 {
   "expo": {
-    "name": "rnative_todo",
-    "slug": "rnative_todo",
+    "name": "TodoHide",
+    "slug": "todohide",
+    "privacy": "unlisted",
+    "description": "Simple todo application working with SamuraiJS API.",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -18,7 +20,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hidekuroi.todohide"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,6 +31,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "46cfd7fe-6da7-4255-9cad-984dc238f11a"
+      }
+    },
+    "owner": "hidekuroi"
   }
 }
