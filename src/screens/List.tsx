@@ -1,10 +1,10 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
-import { useTheme } from '@react-navigation/native'
 import { StatusBar } from 'expo-status-bar'
 import React, { FC, useCallback, useEffect, useState } from 'react'
-import { View, StyleSheet, Text, ScrollView, RefreshControl, ActivityIndicator } from 'react-native'
+import { View, StyleSheet, Text, ScrollView, RefreshControl, ActivityIndicator, Platform } from 'react-native'
 import { todoAPI } from '../api/todo-api'
 import { useAppDispatch } from '../hooks/useAppDispatch'
+import { useMyTheme } from '../hooks/useMyTheme'
 import { TasksType } from '../types/common'
 
 type ListPropsType = {
@@ -16,7 +16,7 @@ const List: FC = (props) => {
 
   //const {login, isAuth} = useTypedSelector(state => state.auth)
 
-  const { colors } = useTheme();
+  const { colors } = useMyTheme();
   const dispatch = useAppDispatch()
   const tabBarHeight = useBottomTabBarHeight()
   //@ts-ignore
@@ -27,7 +27,12 @@ const List: FC = (props) => {
   useEffect(() => {
     fetchTasks()
     //@ts-ignore
-    props.navigation.setOptions({title: list.title})
+    props.navigation.setOptions({title: list.title, 
+     headerLargeTitleStyle: {
+      color: list.color
+     },
+     headerShadowVisible: true
+    })
   }, [])
 
   const fetchTasks = async () => {
@@ -51,7 +56,7 @@ const List: FC = (props) => {
         />
     }>
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
-          {tasks.length > 0 ? <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 12, marginBottom: tabBarHeight, backgroundColor: colors.card, borderRadius: 12, width: '90%'}}>
+          {tasks.length > 0 ? <View style={{justifyContent: 'center', alignItems: 'center', marginBottom: tabBarHeight, backgroundColor: colors.background, width: '100%'}}>
             {tasks[0]?.todoListId === list.id && tasks.map((task: TasksType, index: number) => <View key={task.id} style={{flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', marginVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.divider, width: '100%'}}>
                 <View style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16}}>
                   <Text style={{fontWeight: 'bold', color: colors.text}}>{`${index + 1}. `}</Text>

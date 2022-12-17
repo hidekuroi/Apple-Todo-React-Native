@@ -1,17 +1,19 @@
-import { useTheme } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import { StatusBar } from 'expo-status-bar'
 import React, { FC } from 'react'
 import { View, StyleSheet, Text, ScrollView, Button, Alert, ActionSheetIOS, Platform, TouchableHighlight } from 'react-native'
 import { useAppDispatch } from '../hooks/useAppDispatch'
 // import { signOut } from '../reducers/AuthReducer'
 import { signOut } from '../features/auth/auth-slice'
+import { useMyTheme } from '../hooks/useMyTheme'
 
 const Settings: FC = () => {
 
   //const {login, isAuth} = useTypedSelector(state => state.auth)
 
-  const { colors, dark } = useTheme();
+  const { colors, dark } = useMyTheme();
   const dispatch = useAppDispatch()
+  const navigation = useNavigation()
 
   const TestAlert = () => 
   Alert.alert('Log Out', 'Are you sure you want to log out?',
@@ -31,6 +33,7 @@ const Settings: FC = () => {
 
   const signOutHandler = () => {
     dispatch(signOut())
+    // navigation.navigate('Todos')
   }  
 
   const btnHandler = () => {
@@ -57,7 +60,7 @@ const Settings: FC = () => {
   
   return (
     <ScrollView contentInsetAdjustmentBehavior='automatic' endFillColor={'red'}>
-        <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 12}}>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
           <View style={[styles.list, {backgroundColor: colors.card}]}>
 
             <View style={styles.listItem}>
@@ -82,8 +85,8 @@ const Settings: FC = () => {
 
 const styles = StyleSheet.create({
   list: {
-    width: '90%',
-    borderRadius: 12,
+    width: '91.5%',
+    borderRadius: 11,
     marginBottom: 36
   },
   listItem: {

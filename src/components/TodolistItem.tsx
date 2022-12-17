@@ -1,31 +1,63 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useTheme } from '@react-navigation/native'
-import { StatusBar } from 'expo-status-bar'
 import React, { FC } from 'react'
 import { View, StyleSheet, Text, TouchableHighlight } from 'react-native'
 import { useAppDispatch } from '../hooks/useAppDispatch'
+import { useMyTheme } from '../hooks/useMyTheme'
 
 type TodolistProps = {
   list: any,
   isEven: boolean,
 
-  handlePress: (list: any) => void
+  handlePress: (list: any, color: string) => void
 }
 
 const TodolistItem: FC<TodolistProps> = ({list, handlePress, isEven}) => {
 
   //const {login, isAuth} = useTypedSelector(state => state.auth)
 
-  const { colors } = useTheme()
+  const { colors } = useMyTheme()
   const dispatch = useAppDispatch()
+
+  const num = Math.round(Math.random() * 10)
+  let iconColor: string
+  switch(num) {
+    case 1:
+    case 2:
+    case 3:
+      iconColor = 'tomato'
+      break;
+    case 4:
+    case 5:
+    case 6:  
+      iconColor = '#356ce2'
+      break;
+    case 7:
+    case 8:
+    case 9: 
+      iconColor = '#ff69cc'
+      break;
+    case 10:
+    case 0:
+      iconColor = '#2fdeb1'
+      break;
+    default:
+      iconColor = 'red'
+  }
 
   
   return (
-    <TouchableHighlight activeOpacity={1} underlayColor={colors.touching} style={{}} onPress={() => handlePress(list)}>
+    <TouchableHighlight
+     activeOpacity={1} underlayColor={colors.touching}
+      onPress={() => handlePress(list, iconColor)}>
       <View key={list.id} style={styles.item}>
 
-        <View style={styles.iconPartWrapper}>
-          <Ionicons name='list' color={colors.primary} size={21}/>
+      {/* //?Border radius 8 for square and 50 for ellipse */}
+        <View style={[styles.iconPartWrapper, ]}>
+          <View style={[styles.iconBackground, {backgroundColor: iconColor, borderRadius: 50}]}>
+            <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center'}}>
+            <Ionicons size={20}  color={'white'} name='list' />
+            </View>
+          </View>
         </View>
 
         <View style={[styles.mainPartWrapper, isEven && {borderBottomWidth: 1, borderBottomColor: colors.divider}]}>
@@ -33,7 +65,10 @@ const TodolistItem: FC<TodolistProps> = ({list, handlePress, isEven}) => {
             <Text style={[styles.taskTitleText, {color: colors.text,fontWeight: list.title.startsWith('*') ? 'bold' : 'normal'}]}>
               {list.title.toLowerCase()}
             </Text>
-            <Ionicons name='chevron-forward' size={20} color={colors.helperIcon}/>
+            <View style={styles.helperPart}>
+              <Text style={[{color: colors.helperText}, styles.helperText]}>{list.order}</Text>
+              <Ionicons name='chevron-forward' size={20} color={colors.helperIcon}/>
+            </View>
           </View>
         </View>
       </View>
@@ -45,32 +80,57 @@ const TodolistItem: FC<TodolistProps> = ({list, handlePress, isEven}) => {
 
 const styles = StyleSheet.create({
   item: {
-    width: '100%',
+    // backgroundColor: 'red'
+    // borderWidth: 1,
+    // borderColor: 'red',
+
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    //paddingVertical: 10,
-    // paddingHorizontal: 16
+    // justifyContent: 'space-around',
+    // paddingVertical: 8,
   },
   taskTitleText: {
     fontSize: 17,
 
   },
   mainPartWrapper: {
-    flex: 17,
-    flexDirection: 'row',
-    paddingVertical: 12
+    // flex: 17,
+    // backgroundColor: 'green'
+    // borderWidth: 1,
+    // borderColor: 'green',
+    flexGrow: 1,
+    paddingRight: 12,
+    marginLeft: 12
   },
   mainPart: {
+    // backgroundColor: 'blue'
+    // borderWidth: 1,
+    // borderColor: 'blue',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingRight: 16,
-    width: '100%'
+    paddingVertical: 16
+    // width: '100%'
+
   },
   iconPartWrapper: {
-    flex: 2.6,
-    paddingLeft: 16,
-    alignItems: 'flex-start'
+    // flex: 2.6,
+    // backgroundColor: 'yellow'
+    // borderWidth: 1,
+    // borderColor: 'yellow',
+    marginLeft: 12,
+  },
+  iconBackground: {
+    height: 32,
+    width: 32
+  },
+
+  helperPart: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  helperText: {
+    paddingRight: 6,
+    fontSize: 17
   }
 })
 
