@@ -1,6 +1,11 @@
+import { IsAuthResponseType } from './../api/auth-api';
 export type FormType = {
     email: string,
     password: string
+}
+
+export type FullIsAuthResponseType = IsAuthResponseType & {
+    isAuth: boolean
 }
 //? Min task
 export type UpdateTaskModel = {

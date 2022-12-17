@@ -1,9 +1,10 @@
 import { useTheme } from '@react-navigation/native'
 import { StatusBar } from 'expo-status-bar'
 import React, { FC } from 'react'
-import { View, StyleSheet, Text, ScrollView, Button, Alert, ActionSheetIOS } from 'react-native'
+import { View, StyleSheet, Text, ScrollView, Button, Alert, ActionSheetIOS, Platform, TouchableHighlight } from 'react-native'
 import { useAppDispatch } from '../hooks/useAppDispatch'
-import { signOut } from '../reducers/AuthReducer'
+// import { signOut } from '../reducers/AuthReducer'
+import { signOut } from '../features/auth/auth-slice'
 
 const Settings: FC = () => {
 
@@ -33,29 +34,45 @@ const Settings: FC = () => {
   }  
 
   const btnHandler = () => {
-    ActionSheetIOS.showActionSheetWithOptions({
-      title: "Are you sure you want to log out?",
-      options: ["Cancel", "Log Out"],
-      destructiveButtonIndex: 1,
-      cancelButtonIndex: 0,
-      userInterfaceStyle: (dark ? 'dark' : 'light')
-    }, buttonIndex => {
-      if (buttonIndex === 0) {
-        console.log('cancel')
-      }
-      else {
-        signOutHandler()
-      }
-    })
+    if(Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions({
+        title: "Are you sure you want to log out?",
+        options: ["Cancel", "Log Out"],
+        destructiveButtonIndex: 1,
+        cancelButtonIndex: 0,
+        userInterfaceStyle: (dark ? 'dark' : 'light')
+      }, buttonIndex => {
+        if (buttonIndex === 0) {
+          console.log('cancel')
+        }
+        else {
+          signOutHandler()
+        }
+      })
+    }
+    else {
+      signOutHandler()
+    }
   }
   
   return (
     <ScrollView contentInsetAdjustmentBehavior='automatic' endFillColor={'red'}>
         <View style={{justifyContent: 'center', alignItems: 'center', marginTop: 12}}>
           <View style={[styles.list, {backgroundColor: colors.card}]}>
+
+            <View style={styles.listItem}>
+              {/* <TouchableHighlight activeOpacity={1} underlayColor={colors.touching} onPress={() => alert("TodoHide Native 0.1.1")}> */}
+                <Button title='About alert' onPress={() => alert("TodoHide Native 0.1.1")}/>
+              {/* </TouchableHighlight> */}
+            </View>
+
+          </View>
+          <View style={[styles.list, {backgroundColor: colors.card}]}>
+
             <View style={styles.listItem}>
               <Button title='Log Out' color={'red'} onPress={btnHandler} />
             </View>
+
           </View>
         </View>
         <StatusBar style="auto" />
@@ -67,6 +84,7 @@ const styles = StyleSheet.create({
   list: {
     width: '90%',
     borderRadius: 12,
+    marginBottom: 36
   },
   listItem: {
     fontSize: 17,
