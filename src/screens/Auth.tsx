@@ -64,8 +64,8 @@ const Auth: FC = ({ navigation }) => {
 }
 
 const styles = StyleSheet.create({ 
-    input: {borderStyle: 'solid', borderWidth: 1, borderRadius: 12, padding: 13, marginBottom: 8, fontSize: 16},
-    errorInput: {borderStyle: 'solid', borderWidth: 1, borderColor: 'red', borderRadius: 12, padding: 13, marginBottom: 8, fontSize: 16}  
+    input: {borderStyle: 'solid', borderWidth: 1, borderRadius: 11, padding: 13, marginBottom: 8, fontSize: 16},
+    errorInput: {borderStyle: 'solid', borderWidth: 1, borderColor: 'red', borderRadius: 11, padding: 13, marginBottom: 8, fontSize: 16}  
 })
 
 export default Auth

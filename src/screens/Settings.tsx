@@ -6,6 +6,8 @@ import { useAppDispatch } from '../hooks/useAppDispatch'
 // import { signOut } from '../reducers/AuthReducer'
 import { signOut } from '../features/auth/auth-slice'
 import { useMyTheme } from '../hooks/useMyTheme'
+import CardItem from '../components/CardItem'
+import Card from '../components/Card'
 
 const Settings: FC = () => {
 
@@ -61,22 +63,34 @@ const Settings: FC = () => {
   return (
     <ScrollView contentInsetAdjustmentBehavior='automatic' endFillColor={'red'}>
         <View style={{justifyContent: 'center', alignItems: 'center'}}>
-          <View style={[styles.list, {backgroundColor: colors.card}]}>
 
-            <View style={styles.listItem}>
-              {/* <TouchableHighlight activeOpacity={1} underlayColor={colors.touching} onPress={() => alert("TodoHide Native 0.1.1")}> */}
-                <Button title='About alert' onPress={() => alert("TodoHide Native 0.1.1")}/>
-              {/* </TouchableHighlight> */}
+          
+
+          <View>
+            <Text></Text>
+          </View>
+          <View style={[styles.card, {backgroundColor: colors.card}]}>
+
+            <View style={styles.cardItem}>
+              <CardItem text='About app' onPress={() => navigation.navigate("About")} isLast icon={{iconName:'information-circle', shape:'square', color: colors.primary}} chevron />
             </View>
 
           </View>
-          <View style={[styles.list, {backgroundColor: colors.card}]}>
 
-            <View style={styles.listItem}>
+          <Card>
+            <Card.Item text='Lorem ipsum' disabled helperText='13' onPress={() => console.log('dixy')} icon={{iconName:'cog-outline', shape:'square', color: colors.inputPlaceholder}} chevron />
+            <Card.Item text='Appearence' helperText={dark ? 'Dark' : 'Light'} onPress={() => navigation.navigate("Appearence")} icon={{iconName:'brush', shape:'square', color: "#ff69cc"}} chevron />
+            <Card.Item text='Todo settings' disabled onPress={() => console.log('dixy')} isLast icon={{iconName:'list', shape:'square', color: "#ff5000"}} chevron />
+          </Card>
+
+          <View style={[styles.card, {backgroundColor: colors.card}]}>
+
+            <View style={styles.cardItem}>
               <Button title='Log Out' color={'red'} onPress={btnHandler} />
             </View>
 
           </View>
+
         </View>
         <StatusBar style="auto" />
     </ScrollView>
@@ -84,14 +98,14 @@ const Settings: FC = () => {
 }
 
 const styles = StyleSheet.create({
-  list: {
+  card: {
     width: '91.5%',
     borderRadius: 11,
     marginBottom: 36
   },
-  listItem: {
+  cardItem: {
     fontSize: 17,
-    paddingVertical: 5
+    paddingVertical: 0,
   }
 })
 

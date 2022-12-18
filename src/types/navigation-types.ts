@@ -19,5 +19,7 @@ export type TodoStackParamList = {
 }
 
 export type SettingsStackParamList = {
-    Settings: undefined
+    Settings: undefined,
+    About: undefined,
+    Appearence: undefined
 }

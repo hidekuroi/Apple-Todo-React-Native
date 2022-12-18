@@ -4,6 +4,8 @@ import { Platform } from "react-native";
 import { useMyTheme } from "../../hooks/useMyTheme";
 import Settings from "../../screens/Settings";
 import { SettingsStackParamList } from "../../types/navigation-types";
+import About from "../../screens/About";
+import Appearence from "../../screens/Appearence";
 
 const SettingsStackNavigator = () => {
 
@@ -15,20 +17,26 @@ const SettingsStackNavigator = () => {
       <SettingsStack.Navigator initialRouteName='Settings' 
       screenOptions={
         {
-          headerLargeTitle: true,
-          headerLargeStyle: {backgroundColor: colors.background},
-          // headerStyle: {backgroundColor: colors.card},
+          
+          // headerStyle: {backgroundColor: colors.background},
           headerTransparent: Platform.OS === 'ios' ? true : false,
           headerBlurEffect: 'systemThinMaterial',
+          headerLargeStyle: {backgroundColor: colors.background}
+          
+        }
+      }
+      >
+        <SettingsStack.Screen name="Settings" options={{
+          headerLargeTitle: true,
           headerSearchBarOptions: {
             hideNavigationBar: true,
             placeholder: 'Search',
             hideWhenScrolling: true
           },
-        }
-      }
-      >
-        <SettingsStack.Screen name="Settings" component={Settings}/>
+
+        }} component={Settings}/>
+        <SettingsStack.Screen name="About" component={About} />
+        <SettingsStack.Screen name="Appearence" component={Appearence} />
       </SettingsStack.Navigator>
     )
   }
