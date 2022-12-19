@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { defaultColors, darkColors } from "./colors";
+import { defaultColors, darkColors, draculaMintColors } from "./colors";
 import { useColorScheme } from "react-native";
 
 export const ThemeContext = createContext({

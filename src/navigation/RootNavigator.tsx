@@ -6,19 +6,22 @@ import { useTypedSelector } from "../hooks/useTypedSelector";
 import Auth from "../screens/Auth";
 import MainTabNavigator from "./MainTabNavigator/MainTabNavigator";
 import { useAppDispatch } from "../hooks/useAppDispatch";
-import { authCheck } from "../features/auth/auth-slice";
 import { RootStackParamList } from "../types/navigation-types";
-
-const RootNavigator = () => {
+import { initializeApp } from "../features/appstate/appstate-slice";
+import Loading from "../screens/Loading";
+import { useNavigation } from "@react-navigation/native";
+//@ts-ignore
+const RootNavigator = ({}) => {
 
   const RootStack = createNativeStackNavigator<RootStackParamList>();
 
   const { isAuth } = useTypedSelector(state => state.auth)
+  const { isInitialized } = useTypedSelector(state => state.appstate)
   const dispatch = useAppDispatch()
   const { colors } = useMyTheme()
 
   useEffect(() => {
-    dispatch(authCheck())
+    dispatch(initializeApp())
   }, [])
 
   return(
@@ -27,13 +30,13 @@ const RootNavigator = () => {
         <RootStack.Group>
           <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator} options={{
             headerShown: false,
-            animationTypeForReplace: 'push'
+            animation: 'fade'
           }} />
           
         </RootStack.Group>
         ) : (
           <RootStack.Group>
-            <RootStack.Screen name="Auth" component={Auth}
+            {isInitialized ? <RootStack.Screen name="Auth" component={Auth}
             options={
               {
                 headerLargeTitle: true,
@@ -41,10 +44,18 @@ const RootNavigator = () => {
                 headerStyle: {backgroundColor: colors.card},
                 headerTransparent: Platform.OS === 'ios' ? true : false,
                 headerBlurEffect: 'systemThinMaterial',
-                animationTypeForReplace: 'pop'
+                /*
+                ! lol idk why, but when the MainTabNavigator animation is set to "fade" and this
+                ! animation to "push" all stuff works fine but when it's "pop" - fade animation is used....
+                */
+                animationTypeForReplace: 'push'
               }
             }
-            />
+            /> :
+            <RootStack.Screen name="Loading" component={Loading} options={{
+              headerShown: false,
+            }} />
+            }
           </RootStack.Group>
         )}
       </RootStack.Navigator>

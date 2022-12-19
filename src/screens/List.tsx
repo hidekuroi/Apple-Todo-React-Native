@@ -27,12 +27,14 @@ const List: FC = (props) => {
   useEffect(() => {
     fetchTasks()
     //@ts-ignore
-    props.navigation.setOptions({title: list.title, 
-     headerLargeTitleStyle: {
-      color: list.color
-     },
-     headerShadowVisible: true
-    })
+    props.navigation.setOptions(
+      {
+        title: list.title, 
+        headerLargeTitleStyle: {
+          color: list.color
+        },
+        // headerTintColor: list.color
+      })
   }, [])
 
   const fetchTasks = async () => {
@@ -49,7 +51,7 @@ const List: FC = (props) => {
   }, [])
 
   return (
-    <ScrollView contentInsetAdjustmentBehavior='automatic' endFillColor={'red'} refreshControl={
+    <ScrollView contentInsetAdjustmentBehavior='automatic' refreshControl={
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}

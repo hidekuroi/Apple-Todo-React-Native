@@ -1,3 +1,4 @@
+import { useHeaderHeight } from '@react-navigation/elements'
 import { StatusBar } from 'expo-status-bar'
 import React, { FC, useEffect, useState } from 'react'
 import { View, Text, ScrollView, Button, Image } from 'react-native'
@@ -11,7 +12,10 @@ const About: FC = () => {
 
   const { colors } = useMyTheme();
   const dispatch = useAppDispatch()
-  const { id } = useTypedSelector(state => state.auth)
+  const headerHeight = useHeaderHeight()
+
+  const { id, email } = useTypedSelector(state => state.auth)
+  
 
   const [photo, setPhoto] = useState('')
 
@@ -23,14 +27,10 @@ const About: FC = () => {
 
   return (
     <ScrollView contentInsetAdjustmentBehavior='automatic' style={{backgroundColor: colors.background}}>
-        <View style={{justifyContent: 'center', alignItems: 'center'}}>
-
-            <Card>
-                <View style={{justifyContent: 'center', alignItems: 'center', paddingVertical: 5}}>
-                    <Image source={{uri: photo ? photo : undefined, height: 100, width: 100}} style={{borderRadius: 50, backgroundColor: 'lightgray'}} />
-                </View>
-            </Card>
-                <Button title='About alert' onPress={() => alert("TodoHide Native 0.1.3")}/>
+        <View style={{justifyContent: 'center', alignItems: 'center', marginTop: headerHeight/2}}>
+          <Card>
+            <Card.Item text='Version' helperText='0.1.4' isLast />
+          </Card>
         </View>
         <StatusBar style="auto" />
     </ScrollView>

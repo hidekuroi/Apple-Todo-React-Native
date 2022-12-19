@@ -17,3 +17,12 @@ export const ReactNavigationDarkTheme = {
       card: 'rgb(28, 28, 30)',
     }
 }
+
+export const ReactNavigationDraculaTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: '#292d3e',
+    primary: "#2fdeb1"
+  }
+}

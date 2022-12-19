@@ -32,6 +32,11 @@ const TodoStackNavigator = () => {
         <TodoStack.Screen name="Todos" component={Todos} options={
           {
             title: login,
+            headerSearchBarOptions: {
+              hideNavigationBar: true,
+              placeholder: 'Search',
+              hideWhenScrolling: true
+            },
           }
         } />
 
@@ -40,6 +45,7 @@ const TodoStackNavigator = () => {
             title:'New todolist',
             presentation: 'modal',
             headerBlurEffect: 'systemThinMaterial',
+            headerLargeTitle: false,
             headerLargeStyle: {backgroundColor: colors.modalBackground}
           }
         } />

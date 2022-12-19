@@ -2,7 +2,8 @@ import { NavigatorScreenParams } from "@react-navigation/native"
 
 export type RootStackParamList = {
     MainTabNavigator: NavigatorScreenParams<MainTabParamList>,
-    Auth: undefined
+    Auth: undefined,
+    Loading: undefined
 }
 
 export type MainTabParamList = {
@@ -21,5 +22,6 @@ export type TodoStackParamList = {
 export type SettingsStackParamList = {
     Settings: undefined,
     About: undefined,
-    Appearence: undefined
+    Appearence: undefined,
+    Profile: undefined
 }

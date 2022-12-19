@@ -1,28 +1,36 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
-import { useNavigation, useTheme } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { StatusBar } from 'expo-status-bar'
 import React, { FC, useCallback, useEffect, useState } from 'react'
 import { View, StyleSheet, ScrollView, RefreshControl, Text, Button, TouchableNativeFeedback, TouchableOpacity, Platform } from 'react-native'
-import { todoAPI } from '../api/todo-api'
+import { shallowEqual } from 'react-redux'
 import TodolistItem from '../components/TodolistItem'
+import { getTodos } from '../features/todo/todo-slice'
+import { useAppDispatch } from '../hooks/useAppDispatch'
+import { useMyTheme } from '../hooks/useMyTheme'
+import { useTypedSelector } from '../hooks/useTypedSelector'
+import { TodoType } from '../types/common'
 import { RootStackParamList } from '../types/navigation-types'
 
-const Todos: FC = () => {
+const Todos: FC = (props) => {
 
   //const {login, isAuth} = useTypedSelector(state => state.auth)
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const dispatch = useAppDispatch()
 
-  const { colors } = useTheme();
+  const { colors } = useMyTheme();
   const bottomBarHeight = useBottomTabBarHeight()
 
-  const [todolists, setTodolists] = useState<any>([])
+
+  const {todoData} = useTypedSelector(state => state.todo, shallowEqual)
   
-  const [show, setShow] = useState<boolean>(false)
   const [refreshing, setRefreshing] = useState<boolean>(false)
+  const [todolists, setTodolists] = useState<Array<TodoType>>([])
 
   useEffect(() => {
+
     getLists()
 
     navigation.setOptions({
@@ -30,27 +38,32 @@ const Todos: FC = () => {
         <TouchableOpacity onPress={() => navigation.navigate("CreateNewListModal")}><Ionicons name='add' color={colors.primary} size={32}/></TouchableOpacity>
       </View>
     })
-  }, [])
+  }, [
+    //? for themes with different primary color
+    // colors
+  ])
 
+  useEffect(() => {
+    console.log('changed')
+  }, [props])
+  
 
   const getLists = async () => {
-    todoAPI.getTodolists().then(data => setTodolists(data))
+    dispatch(getTodos())
   }
 
-
-  const handlePress = (list: any, color = colors.text) => {
+console.log('rerender')
+  const listNavigate = (list: TodoType, color = colors.text) => {
     navigation.navigate('List', {...list, color})
   }
 
   const onRefresh = useCallback(() => {
     setRefreshing(true)
-    getLists().then(() => {
-       setRefreshing(false)
-    })
+    getLists().then(() => setRefreshing(false))
   }, [])
   
   return (
-    <ScrollView contentInsetAdjustmentBehavior='automatic' endFillColor={'red'} refreshControl={
+    <ScrollView contentInsetAdjustmentBehavior='automatic' refreshControl={
         <RefreshControl
           refreshing={refreshing}
           onRefresh={onRefresh}
@@ -58,9 +71,9 @@ const Todos: FC = () => {
       }>
         <View style={[styles.wrapper, {marginTop: 0, marginBottom: bottomBarHeight*2}]}>
           <View style={[styles.list, {backgroundColor: colors.card}]}>
-            {todolists.map((list:any, index: number) => 
+            {todoData?.map((list: TodoType, index: number) => 
             <View key={list.id}>
-              <TodolistItem list={list} handlePress={handlePress} isEven={index + 1 !== todolists.length}/>
+              <TodolistItem text={list.title} handlePress={(color: string) => listNavigate(list, color)} isLast={index + 1 !== todoData.length}/>
             </View>
             )}
           </View>

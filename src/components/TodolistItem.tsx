@@ -1,55 +1,59 @@
 import { Ionicons } from '@expo/vector-icons'
-import React, { FC } from 'react'
+import React, { FC, useMemo } from 'react'
 import { View, StyleSheet, Text, TouchableHighlight } from 'react-native'
 import { useAppDispatch } from '../hooks/useAppDispatch'
 import { useMyTheme } from '../hooks/useMyTheme'
 
 type TodolistProps = {
-  list: any,
-  isEven: boolean,
+  text: string,
+  isLast?: boolean,
 
-  handlePress: (list: any, color: string) => void
+  handlePress: (color: string) => void
 }
 
-const TodolistItem: FC<TodolistProps> = ({list, handlePress, isEven}) => {
+const TodolistItem: FC<TodolistProps> = ({text, handlePress, isLast = false}) => {
 
   //const {login, isAuth} = useTypedSelector(state => state.auth)
 
   const { colors } = useMyTheme()
-  const dispatch = useAppDispatch()
 
-  const num = Math.round(Math.random() * 10)
-  let iconColor: string
-  switch(num) {
-    case 1:
-    case 2:
-    case 3:
-      iconColor = 'tomato'
-      break;
-    case 4:
-    case 5:
-    case 6:  
-      iconColor = '#356ce2'
-      break;
-    case 7:
-    case 8:
-    case 9: 
-      iconColor = '#ff69cc'
-      break;
-    case 10:
-    case 0:
-      iconColor = '#2fdeb1'
-      break;
-    default:
-      iconColor = 'red'
+  const randomColor = () => {
+    let value: string
+    const num = Math.round(Math.random() * 10)
+    switch(num) {
+      case 1:
+      case 2:
+      case 3:
+        value = 'tomato'
+        break;
+      case 4:
+      case 5:
+      case 6:  
+        value = '#356ce2'
+        break;
+      case 7:
+      case 8:
+      case 9: 
+        value = '#ff69cc'
+        break;
+      case 10:
+      case 0:
+        value = '#2fdeb1'
+        break;
+      default:
+        value = 'red'
+    }
+    return value
   }
 
-  
+  let iconColor: string = useMemo(() => randomColor(), [])
+
+
   return (
     <TouchableHighlight
      activeOpacity={1} underlayColor={colors.touching}
-      onPress={() => handlePress(list, iconColor)}>
-      <View key={list.id} style={styles.item}>
+      onPress={() => handlePress(iconColor)}>
+      <View style={styles.item}>
 
       {/* //?Border radius 8 for square and 50 for ellipse */}
         <View style={[styles.iconPartWrapper, ]}>
@@ -60,13 +64,13 @@ const TodolistItem: FC<TodolistProps> = ({list, handlePress, isEven}) => {
           </View>
         </View>
 
-        <View style={[styles.mainPartWrapper, isEven && {borderBottomWidth: 1, borderBottomColor: colors.divider}]}>
+        <View style={[styles.mainPartWrapper, isLast && {borderBottomWidth: 1, borderBottomColor: colors.divider}]}>
           <View style={styles.mainPart}>
-            <Text style={[styles.taskTitleText, {color: colors.text,fontWeight: list.title.startsWith('*') ? 'bold' : 'normal'}]}>
-              {list.title.toLowerCase()}
+            <Text style={[styles.taskTitleText, {color: colors.text,fontWeight: text.startsWith('*') ? 'bold' : 'normal'}]}>
+              {text.toLowerCase()}
             </Text>
             <View style={styles.helperPart}>
-              <Text style={[{color: colors.helperText}, styles.helperText]}>{list.order}</Text>
+              {/* <Text style={[{color: colors.helperText}, styles.helperText]}>{list.order}</Text> */}
               <Ionicons name='chevron-forward' size={20} color={colors.helperIcon}/>
             </View>
           </View>

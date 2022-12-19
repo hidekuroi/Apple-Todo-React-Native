@@ -7,6 +7,7 @@ import { useMyTheme } from "../../hooks/useMyTheme";
 import TodoStackNavigator from "./TodoStackNavigator";
 import SettingsStackNavigator from "./SettingsStackNavigator";
 import { MainTabParamList } from "../../types/navigation-types";
+import { useNavigation } from "@react-navigation/native";
 
 const MainTabNavigator = () => {
 

@@ -51,7 +51,7 @@ const CardItem: FC<CardItemProps> = (
       {/* //?Border radius 8 for square and 50 for ellipse */}
         {icon && <View style={[styles.iconPartWrapper, ]}>
           <View style={[styles.iconBackground, {backgroundColor: icon.color ? icon.color : 'blue', borderRadius: icon.shape === 'ellipse' ? 50 : 8, opacity: disabled ? 0.5 : 1}]}>
-            <View style={{position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center'}}>
+            <View style={{position: 'absolute', left: 1, right: 0, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center'}}>
             {/* //? Idk. There are no exports of icon name strings.
             //? I'd be happy to use types here but they're just declaring it with plain | icon-name | icon-name2 | ...... */}
             {/* @ts-ignore */}

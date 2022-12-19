@@ -1,4 +1,4 @@
-import { ReactNavigationDarkTheme, ReactNavigationDefaultTheme } from "./ReactNavigationThemes"
+import { ReactNavigationDarkTheme, ReactNavigationDefaultTheme, ReactNavigationDraculaTheme } from "./ReactNavigationThemes"
 
 export const defaultColors = {
     ...ReactNavigationDefaultTheme.colors,
@@ -34,4 +34,21 @@ export const darkColors = {
     modalCard: 'rgb(44, 44, 46)',
     modalInput: 'rgb(71, 71, 75)'
 
+}
+
+export const draculaMintColors = {
+    ...ReactNavigationDraculaTheme.colors,
+    background: '#292d3e',
+    card: '#212432',
+    touching: '#353a51',
+    divider: '#212432',
+    helperText: '#9696ae',
+    helperIcon: '#9696ae',
+    touchingHelperIcon: 'rgb(101, 101, 105)',
+    disabledText: '#4e515f',
+    input: '#292d3e',
+    inputPlaceholder: '#717790',
+    modalBackground: '#212432',
+    modalCard: '#263038',
+    modalInput: 'rgb(71, 71, 75)',
 }
