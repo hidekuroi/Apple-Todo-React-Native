@@ -46,7 +46,6 @@ const Settings: FC = () => {
     }
   }
 
-  console.log('SADASDAS')
   
   return (
     <ScrollView contentInsetAdjustmentBehavior='automatic'>

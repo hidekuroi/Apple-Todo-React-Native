@@ -46,7 +46,8 @@ const TodoStackNavigator = () => {
             presentation: 'modal',
             headerBlurEffect: 'systemThinMaterial',
             headerLargeTitle: false,
-            headerLargeStyle: {backgroundColor: colors.modalBackground}
+            headerLargeStyle: {backgroundColor: colors.modalBackground},
+            gestureEnabled: false
           }
         } />
           

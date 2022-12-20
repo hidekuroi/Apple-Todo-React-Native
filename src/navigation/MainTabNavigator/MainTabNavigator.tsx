@@ -7,11 +7,12 @@ import { useMyTheme } from "../../hooks/useMyTheme";
 import TodoStackNavigator from "./TodoStackNavigator";
 import SettingsStackNavigator from "./SettingsStackNavigator";
 import { MainTabParamList } from "../../types/navigation-types";
-import { useNavigation } from "@react-navigation/native";
+import { getFocusedRouteNameFromRoute, useNavigation } from "@react-navigation/native";
 
 const MainTabNavigator = () => {
 
     const MainTab = createBottomTabNavigator<MainTabParamList>();
+
 
     const { dark } = useMyTheme()
 
@@ -24,7 +25,8 @@ const MainTabNavigator = () => {
           tabBarLabel: 'Todo',
           tabBarIcon: ({size, color, focused}) => (
             <Ionicons name={focused ? 'checkbox' : 'checkbox-outline'} size={size} color={color}/>
-          )
+          ),
+          
         }}/>
         <MainTab.Screen name="SettingsStackNavigator" component={SettingsStackNavigator} options={{
           tabBarLabel: 'Settings',

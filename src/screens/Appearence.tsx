@@ -25,6 +25,7 @@ const Appearence: FC = () => {
                 <Card.Item text='test' isLast switchValue={value} onSwitch={() => setValue(!value)}/>
             </Card>
             {value && <Button title='Secret button' color={colors.primary} onPress={() => alert('Dxon Broudi')} />}
+            <Text style={{color: colors.test}}>Platform colors</Text>
         </View>
         <StatusBar style="auto" />
     </ScrollView>

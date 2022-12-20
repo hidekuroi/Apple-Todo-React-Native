@@ -1,3 +1,4 @@
+import { PlatformColor } from "react-native"
 import { ReactNavigationDarkTheme, ReactNavigationDefaultTheme, ReactNavigationDraculaTheme } from "./ReactNavigationThemes"
 
 export const defaultColors = {
@@ -14,7 +15,9 @@ export const defaultColors = {
     inputPlaceholder: 'rgb(142, 142, 147)',
     modalBackground: 'rgb(242, 242, 246)',
     modalCard: 'rgb(255, 255, 255)',
-    modalInput: 'rgb(228, 228, 229)'
+    modalInput: 'rgb(228, 228, 229)',
+
+    test: PlatformColor('secondaryLabel')
 
 }
 
@@ -32,7 +35,9 @@ export const darkColors = {
     inputPlaceholder: 'rgb(142, 142, 147)',
     modalBackground: 'rgb(28, 28, 30)',
     modalCard: 'rgb(44, 44, 46)',
-    modalInput: 'rgb(71, 71, 75)'
+    modalInput: 'rgb(71, 71, 75)',
+
+    test: PlatformColor('secondaryLabel')
 
 }
 
@@ -48,7 +53,7 @@ export const draculaMintColors = {
     disabledText: '#4e515f',
     input: '#292d3e',
     inputPlaceholder: '#717790',
-    modalBackground: '#212432',
-    modalCard: '#263038',
-    modalInput: 'rgb(71, 71, 75)',
+    modalBackground: '#292d3e',
+    modalCard: '#212432',
+    modalInput: '#292d3e',
 }

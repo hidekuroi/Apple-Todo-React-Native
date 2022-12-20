@@ -14,22 +14,16 @@ const About: FC = () => {
   const dispatch = useAppDispatch()
   const headerHeight = useHeaderHeight()
 
-  const { id, email } = useTypedSelector(state => state.auth)
-  
+  const [version, setVersion] = useState(['0.1.5', 'etude'])
 
-  const [photo, setPhoto] = useState('')
 
-  useEffect(() => {
-    profileAPI.getProfile(id).then((data) => {
-        setPhoto(data.photos.large)
-    })
-  }, [])
+
 
   return (
     <ScrollView contentInsetAdjustmentBehavior='automatic' style={{backgroundColor: colors.background}}>
         <View style={{justifyContent: 'center', alignItems: 'center', marginTop: headerHeight/2}}>
           <Card>
-            <Card.Item text='Version' helperText='0.1.4' isLast />
+            <Card.Item text='Version' helperText={version[0]} onPress={() => setVersion([version[1], version[0]])} isLast />
           </Card>
         </View>
         <StatusBar style="auto" />

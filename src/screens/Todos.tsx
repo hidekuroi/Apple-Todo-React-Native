@@ -16,15 +16,15 @@ import { RootStackParamList } from '../types/navigation-types'
 
 const Todos: FC = (props) => {
 
-  //const {login, isAuth} = useTypedSelector(state => state.auth)
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const dispatch = useAppDispatch()
 
   const { colors } = useMyTheme();
   const bottomBarHeight = useBottomTabBarHeight()
 
-
-  const {todoData} = useTypedSelector(state => state.todo, shallowEqual)
+  const todoData = useTypedSelector(state => state.todo.todoData, shallowEqual)
+  // const totalCount = useTypedSelector(state => state.todo.totalCount)
+  const isTodolistsFetching = useTypedSelector(state => state.todo.isTodolistsFetching)
   
   const [refreshing, setRefreshing] = useState<boolean>(false)
   const [todolists, setTodolists] = useState<Array<TodoType>>([])
@@ -46,6 +46,10 @@ const Todos: FC = (props) => {
   useEffect(() => {
     console.log('changed')
   }, [props])
+
+  useEffect(() => {
+    if(!isTodolistsFetching && refreshing) setRefreshing(false)
+  }, [isTodolistsFetching])
   
 
   const getLists = async () => {
@@ -57,9 +61,12 @@ console.log('rerender')
     navigation.navigate('List', {...list, color})
   }
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async() => {
     setRefreshing(true)
-    getLists().then(() => setRefreshing(false))
+    getLists()
+    // .then((data) => {
+    //   setRefreshing(false)
+    // })
   }, [])
   
   return (
@@ -70,6 +77,7 @@ console.log('rerender')
         />
       }>
         <View style={[styles.wrapper, {marginTop: 0, marginBottom: bottomBarHeight*2}]}>
+          {/* <Button title='refresh' onPress={onRefresh} /> */}
           <View style={[styles.list, {backgroundColor: colors.card}]}>
             {todoData?.map((list: TodoType, index: number) => 
             <View key={list.id}>

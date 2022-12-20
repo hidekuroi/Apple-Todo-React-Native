@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { AppDispatch } from '../../app/store';
 import { todoAPI } from '../../api/todo-api';
+import { batch } from 'react-redux';
 
 interface TodoStateType {
     todoData: Array<TodoType> | [],
@@ -35,17 +36,18 @@ const todoSlice = createSlice({
             state.error = action.payload
         },
 
-        addTotalCount(state, action: PayloadAction<number>) {
-            state.totalCount = state.totalCount + action.payload;
+        setTotalCount(state, action: PayloadAction<number>) {
+            state.totalCount = action.payload;
         },
 
         setTodolists(state, action: PayloadAction<Array<TodoType> | []>) {
             state.todoData = action.payload
+            state.totalCount = action.payload.length
         }
     }
 })
 
-export const { setTodolistsFetching, setError, setTodolists } = todoSlice.actions
+export const { setTodolistsFetching, setError, setTodolists, setTotalCount } = todoSlice.actions
 
 //*THUNKS
 
@@ -54,8 +56,13 @@ export const getTodos = () => {
         dispatch(setTodolistsFetching(true))
         try{
             const response = await todoAPI.getTodolists()
+            batch(() => {
                 dispatch(setTodolists(response))
+
                 dispatch(setTodolistsFetching(false))
+                    
+            })
+                
         }
         catch(e: any) {
             console.log(e)

@@ -67,7 +67,7 @@ const TodolistItem: FC<TodolistProps> = ({text, handlePress, isLast = false}) =>
         <View style={[styles.mainPartWrapper, isLast && {borderBottomWidth: 1, borderBottomColor: colors.divider}]}>
           <View style={styles.mainPart}>
             <Text style={[styles.taskTitleText, {color: colors.text,fontWeight: text.startsWith('*') ? 'bold' : 'normal'}]}>
-              {text.toLowerCase()}
+              {text}
             </Text>
             <View style={styles.helperPart}>
               {/* <Text style={[{color: colors.helperText}, styles.helperText]}>{list.order}</Text> */}
