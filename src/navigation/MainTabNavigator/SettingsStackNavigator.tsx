@@ -1,40 +1,41 @@
-import React from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Platform } from "react-native";
-import { useMyTheme } from "../../hooks/useMyTheme";
-import Settings from "../../screens/Settings";
-import { SettingsStackParamList } from "../../types/navigation-types";
-import About from "../../screens/About";
-import Appearence from "../../screens/Appearence";
-import Profile from "../../screens/Profile";
+import React from "react"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import { Platform } from "react-native"
+import { useMyTheme } from "../../hooks/useMyTheme"
+import Settings from "../../screens/SettingsScreens/Settings"
+import About from "../../screens/SettingsScreens/About"
+import Appearence from "../../screens/SettingsScreens/Appearence"
+import Profile from "../../screens/SettingsScreens/Profile"
+import { SettingsStackParamList } from "../../types/navigation-types"
 
 const SettingsStackNavigator = () => {
+  const SettingsStack = createNativeStackNavigator<SettingsStackParamList>()
 
-    const SettingsStack = createNativeStackNavigator<SettingsStackParamList>()
+  const { colors } = useMyTheme()
 
-    const { colors } = useMyTheme()
-
-    return(
-      <SettingsStack.Navigator initialRouteName='Settings' 
-      screenOptions={
-        {
-          
-          // headerStyle: {backgroundColor: colors.background},
-          headerTransparent: Platform.OS === 'ios' ? true : false,
-          headerBlurEffect: 'systemThinMaterial',
-          headerLargeStyle: {backgroundColor: colors.background},
-          animation: 'default',
-        }
-      }
-      >
-        <SettingsStack.Screen name="Settings" options={{
+  return (
+    <SettingsStack.Navigator
+      initialRouteName="Settings"
+      screenOptions={{
+        // headerStyle: {backgroundColor: colors.background},
+        headerTransparent: Platform.OS === "ios" ? true : false,
+        headerBlurEffect: "systemThinMaterial",
+        headerLargeStyle: { backgroundColor: colors.background },
+        animation: "default",
+      }}
+    >
+      <SettingsStack.Screen
+        name="Settings"
+        options={{
           headerLargeTitle: true,
-        }} component={Settings}/>
-        <SettingsStack.Screen name="About" component={About} />
-        <SettingsStack.Screen name="Appearence" component={Appearence} />
-        <SettingsStack.Screen name="Profile" component={Profile} />
-      </SettingsStack.Navigator>
-    )
-  }
+        }}
+        component={Settings}
+      />
+      <SettingsStack.Screen name="About" component={About} />
+      <SettingsStack.Screen name="Appearence" component={Appearence} />
+      <SettingsStack.Screen name="Profile" component={Profile} />
+    </SettingsStack.Navigator>
+  )
+}
 
-export default SettingsStackNavigator;
+export default SettingsStackNavigator
