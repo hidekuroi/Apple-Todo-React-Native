@@ -84,6 +84,7 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
+      showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }

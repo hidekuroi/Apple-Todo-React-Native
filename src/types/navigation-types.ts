@@ -3,6 +3,10 @@ import { NavigatorScreenParams } from "@react-navigation/native"
 
 export type RootStackParamList = {
   MainTabNavigator: NavigatorScreenParams<MainTabParamList>
+  List: {
+    list: TodoType
+    color: string
+  }
   Auth: undefined
   Loading: undefined
 }
@@ -15,10 +19,10 @@ export type MainTabParamList = {
 export type TodoStackParamList = {
   Todos: undefined
   CreateNewListModal: undefined
-  List: {
-    list: TodoType
-    color: string
-  }
+  // List: {
+  //   list: TodoType
+  //   color: string
+  // }
 }
 
 export type SettingsStackParamList = {

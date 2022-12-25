@@ -1,9 +1,9 @@
+import { todoAPI } from './../../api/todo-api';
 import { SetTasksPayloadType } from "./../../types/common"
-import { TodoType } from "../../types/common"
+import { TodoType, UpdateTaskModel } from "../../types/common"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 // import { createAsyncThunk } from "@reduxjs/toolkit"
 import { AppDispatch } from "../../app/store"
-import { todoAPI } from "../../api/todo-api"
 import { batch } from "react-redux"
 
 interface TodoStateType {
@@ -89,6 +89,38 @@ export const getTasks = (listId: string) => {
       const response = await todoAPI.getTasks(listId)
       dispatch(setTasks({ ...response, listId }))
     } catch (e: any) {
+      console.log(e)
+    }
+  }
+}
+
+export const changeTask = (listId: string, taskId: string, updatedTask: UpdateTaskModel) => {
+  return async (dispatch: AppDispatch) => {
+    try{
+      const response = await todoAPI.taskChange(listId, taskId, updatedTask)
+    } catch (e: any) {
+      console.log(e)
+    }
+  }
+}
+
+export const deleteTask = (listId: string, taskId: string) => {
+  return async (dispatch: AppDispatch) => {
+    try{
+      const response = await todoAPI.removeTask(listId, taskId)
+    } catch(e: any) {
+      console.log(e)
+    }
+  }
+}
+
+export const createTask = (listId: string, title: string) => {
+  return async (dispatch: AppDispatch) => {
+    try {
+      const response = await todoAPI.createTask(title, listId)
+      return response.data
+    }
+    catch (e: any) {
       console.log(e)
     }
   }

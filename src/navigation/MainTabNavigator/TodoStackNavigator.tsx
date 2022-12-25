@@ -21,7 +21,7 @@ const TodoStackNavigator = () => {
         headerLargeTitle: true,
         headerLargeStyle: { backgroundColor: colors.background },
         headerTransparent: Platform.OS === "ios" ? true : false,
-        headerBlurEffect: "systemThinMaterial",
+        headerBlurEffect: "systemMaterial",
         headerBackTitle: "Back",
       }}
     >
@@ -51,14 +51,14 @@ const TodoStackNavigator = () => {
         }}
       />
 
-      <TodoStack.Screen
+      {/* <TodoStack.Screen
         name="List"
         component={List}
         options={{
           presentation: "card",
           headerLargeStyle: { backgroundColor: colors.background },
         }}
-      />
+      /> */}
     </TodoStack.Navigator>
   )
 }

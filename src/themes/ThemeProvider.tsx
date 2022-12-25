@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from "react"
 import { defaultColors, darkColors, draculaMintColors } from "./colors"
-import { useColorScheme } from "react-native"
+import { Platform, useColorScheme } from "react-native"
 
 export const ThemeContext = createContext({
   dark: false,
@@ -10,7 +10,10 @@ export const ThemeContext = createContext({
 })
 
 export const ThemeProvider = (props: any) => {
-  const colorScheme = useColorScheme()
+  let colorScheme = useColorScheme()
+  //
+  Platform.OS === "web" ? (colorScheme = "dark") : (colorScheme = colorScheme)
+  //
   const [isDark, setIsDark] = useState(colorScheme === "dark")
 
   useEffect(() => {

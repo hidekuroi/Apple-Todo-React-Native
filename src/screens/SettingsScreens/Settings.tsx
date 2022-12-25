@@ -70,10 +70,14 @@ const Settings: FC<SettingsScreenProps> = ({ navigation }) => {
 
         <Card>
           <Card.Item
-            text="Lorem ipsum odolore irokinum"
-            disabled
+            text="Lorem ipsum dolore irokinum"
+            // disabled
             helperText="13"
-            onPress={() => console.log("dixy")}
+            onPress={() =>
+              alert(
+                `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`
+              )
+            }
             icon={{
               iconName: "cog-outline",
               shape: "square",
@@ -103,10 +107,9 @@ const Settings: FC<SettingsScreenProps> = ({ navigation }) => {
         </Card>
 
         <Card>
-          <CardItem
+          <Card.Item
             text="About"
             onPress={() => navigation.navigate("About")}
-            isLast
             icon={{
               iconName: "information-circle",
               shape: "square",

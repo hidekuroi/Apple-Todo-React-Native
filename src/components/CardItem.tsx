@@ -19,6 +19,8 @@ type IconType = {
 export type CardItemProps = {
   text: string
   helperText?: string
+  isFirst?: boolean
+  isSingle?: boolean
   isLast?: boolean
   icon?: IconType
   chevron?: boolean
@@ -33,12 +35,14 @@ export type CardItemProps = {
 const CardItem: FC<CardItemProps> = ({
   text,
   helperText,
-  isLast = false,
+  isFirst,
+  isSingle,
+  isLast,
   icon,
-  chevron = false,
-  loading = false,
+  chevron,
+  loading,
   switchValue,
-  disabled = false,
+  disabled,
   onPress,
   onSwitch,
 }) => {
@@ -46,7 +50,11 @@ const CardItem: FC<CardItemProps> = ({
 
   return (
     <TouchableHighlight
-      style={{ borderRadius: 11 }}
+      style={[
+        isSingle && { borderRadius: 11 },
+        isFirst && { borderTopRightRadius: 11, borderTopLeftRadius: 11 },
+        isLast && { borderBottomLeftRadius: 11, borderBottomRightRadius: 11 },
+      ]}
       activeOpacity={1}
       underlayColor={colors.touching}
       onPress={onPress && !disabled ? () => onPress() : undefined}
@@ -88,10 +96,11 @@ const CardItem: FC<CardItemProps> = ({
         <View
           style={[
             styles.mainPartWrapper,
-            !isLast && {
-              borderBottomWidth: 1,
-              borderBottomColor: colors.divider,
-            },
+            !isLast &&
+              !isSingle && {
+                borderBottomWidth: 1,
+                borderBottomColor: colors.divider,
+              },
           ]}
         >
           <View style={styles.mainPart}>

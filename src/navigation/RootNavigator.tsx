@@ -9,6 +9,7 @@ import { useAppDispatch } from "../hooks/useAppDispatch"
 import { RootStackParamList } from "../types/navigation-types"
 import { initializeApp } from "../features/appstate/appstate-slice"
 import Loading from "../screens/Loading"
+import List from "../screens/TodoScreens/List"
 
 const RootNavigator = () => {
   const RootStack = createNativeStackNavigator<RootStackParamList>()
@@ -34,6 +35,16 @@ const RootNavigator = () => {
               animation: "fade",
             }}
           />
+          <RootStack.Screen
+            name="List"
+            component={List}
+            options={{
+              headerLargeTitle: true,
+              headerLargeStyle: { backgroundColor: colors.background },
+              headerTransparent: Platform.OS === "ios" ? true : false,
+              headerBlurEffect: "systemMaterial",
+            }}
+          />
         </RootStack.Group>
       ) : (
         <RootStack.Group>
@@ -46,7 +57,7 @@ const RootNavigator = () => {
                 headerLargeStyle: { backgroundColor: colors.background },
                 headerStyle: { backgroundColor: colors.card },
                 headerTransparent: Platform.OS === "ios" ? true : false,
-                headerBlurEffect: "systemThinMaterial",
+                headerBlurEffect: "systemMaterial",
                 /*
                 ! lol idk why, but when the MainTabNavigator animation is set to "fade" and this
                 ! animation to "push" all stuff works fine but when it's "pop" - fade animation is used....

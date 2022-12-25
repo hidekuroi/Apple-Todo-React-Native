@@ -28,7 +28,7 @@ const MainTabNavigator = () => {
                 />
               )
             : undefined,
-        tabBarStyle: { position: "absolute" },
+        tabBarStyle: { position: "absolute", },
       }}
     >
       <MainTab.Screen
