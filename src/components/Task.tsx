@@ -1,11 +1,6 @@
 import { Ionicons } from "@expo/vector-icons"
 import React, { FC, useEffect, useState } from "react"
-import {
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native"
+import { Pressable, Text, TextInput, View } from "react-native"
 import { ColorsType } from "../themes/colors"
 import { TasksType, UpdateTaskModel } from "../types/common"
 import * as Haptics from "expo-haptics"
@@ -21,61 +16,93 @@ type Props = {
   isCreatingTask?: boolean
 }
 
-const Task: FC<Props> = ({ task, index, colors, btnColor, isCreatingTask=false, listId }) => {
+const Task: FC<Props> = ({
+  task,
+  index,
+  colors,
+  btnColor,
+  isCreatingTask = false,
+  listId,
+}) => {
   const dispatch = useAppDispatch()
+  const [taskData, setTaskData] = useState<TasksType>(
+    task
+      ? task
+      : {
+          addedDate: Date.now().toString(),
+          completed: false,
+          deadline: "",
+          description: "",
+          id: "",
+          order: 0,
+          priority: 0,
+          startDate: "",
+          status: 0,
+          title: "",
+          todoListId: listId,
+        }
+  )
   const [isCreating, setIsCreating] = useState<boolean>(isCreatingTask)
-  const [status, setStatus] = useState<boolean>(task?.status && !isCreating ? true : false)
-  const [taskTitle, setTaskTitle] = useState<string>(task?.title && !isCreating ? task.title : '')
-  const [taskId, setTaskId] = useState<string>(task?.id ? task?.id : '')
-
+  const [status, setStatus] = useState<boolean>(
+    taskData.status ? true : false
+  )
+  const [taskTitle, setTaskTitle] = useState<string>(
+    task?.title && !isCreating ? task.title : ""
+  )
+  const [visible, setVisible] = useState<boolean>(true)
 
   useEffect(() => {
-    if(!isCreating) {
-    let taskStatus = task.status ? true : false
-    if (taskStatus !== status) setStatus(taskStatus)
-    if (taskTitle !== task.title) setTaskTitle(task.title)
-    // console.log('task')
+    if (!isCreating) {
+      let taskStatus = taskData.status ? true : false
+      if (taskStatus !== status) setStatus(taskStatus)
+      if (taskTitle !== taskData.title) setTaskTitle(taskData.title)
+      // console.log('task')
     }
-  }, [task])
-// console.log('taskRENDER')
+  }, [taskData])
+  console.log("taskRENDER")
   const radioHandle = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
     setStatus(!status)
 
-    if(!isCreating) {
+    if (!isCreating) {
       const updatedTask: UpdateTaskModel = {
-        ...task,
-        status: task.status ? 0 : 1
+        ...taskData,
+        status: taskData.status ? 0 : 1,
       }
-      dispatch(changeTask(task.todoListId, task.id, updatedTask))
+      dispatch(changeTask(taskData.todoListId, taskData.id, updatedTask))
     }
   }
 
   const changeTitle = () => {
-    if(!isCreating) {
-      if(taskTitle !== task.title) {
-        if(taskTitle.length) {
+    if (!isCreating) {
+      if (taskTitle !== taskData.title) {
+        if (taskTitle.trim().length) {
           const updatedTask: UpdateTaskModel = {
-            ...task,
-            title: taskTitle
+            ...taskData,
+            title: taskTitle,
           }
-          dispatch(changeTask(task.todoListId, task.id, updatedTask))
-        }
-        else {
-          dispatch(deleteTask(task.todoListId, task.id))
+          dispatch(changeTask(taskData.todoListId, taskData.id, updatedTask))
+        } else {
+          dispatch(deleteTask(taskData.todoListId, taskData.id))
+          setVisible(false)
         }
       }
-    }
-    else {
-      if(taskTitle) dispatch(createTask(listId, taskTitle)).then((data) => {
-        console.log(data)
-      })
+    } else {
+      if (taskTitle) {
+        dispatch(createTask(listId, taskTitle)).then((data) => {
+          if (data?.item) {
+            console.log(data)
+            setTaskData(data?.item)
+            setIsCreating(false)
+          } else alert("Some error occured")
+        })
+      } else setVisible(false)
     }
   }
 
-  if(index === 1) console.log('TASK')
+  if (index === 1) console.log("TASK")
 
-  return (
+  return visible ? (
     <View
       style={{
         // paddingVertical: 10,
@@ -91,7 +118,7 @@ const Task: FC<Props> = ({ task, index, colors, btnColor, isCreatingTask=false, 
           width: "95%",
           flexDirection: "row",
           justifyContent: "flex-start",
-          //? Maybe 'll delete this one to make icon at the start of task 
+          //? Maybe 'll delete this one to make icon at the start of task
           alignItems: "center",
         }}
       >
@@ -105,7 +132,7 @@ const Task: FC<Props> = ({ task, index, colors, btnColor, isCreatingTask=false, 
         </Pressable>
 
         <Pressable
-          onLongPress={(e: any) => console.log('dixon')}
+          onLongPress={(e: any) => console.log("dixon")}
           style={{
             borderBottomWidth: 0.8,
             borderBottomColor: colors.divider,
@@ -123,6 +150,7 @@ const Task: FC<Props> = ({ task, index, colors, btnColor, isCreatingTask=false, 
             autoFocus={isCreating}
             scrollEnabled={false}
             spellCheck={false}
+            maxLength={100}
             multiline
             style={{
               color: status ? colors.disabledText : colors.text,
@@ -132,6 +160,8 @@ const Task: FC<Props> = ({ task, index, colors, btnColor, isCreatingTask=false, 
         </Pressable>
       </View>
     </View>
+  ) : (
+    <View style={{ display: "none" }}></View>
   )
 }
 

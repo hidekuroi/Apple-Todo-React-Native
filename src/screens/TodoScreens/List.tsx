@@ -1,4 +1,3 @@
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import { useHeaderHeight } from "@react-navigation/elements"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { BlurView } from "expo-blur"
@@ -26,16 +25,14 @@ import { getTasks, getTodos, setError } from "../../features/todo/todo-slice"
 import { useAppDispatch } from "../../hooks/useAppDispatch"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
-import { RootStackParamList, TodoStackParamList } from "../../types/navigation-types"
+import { RootStackParamList } from "../../types/navigation-types"
 import { deepComparison } from "../../utils/deepComparison"
 
-const { width, height } = Dimensions.get('screen')
-const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
+const { height } = Dimensions.get("screen")
 
 type ListProps = NativeStackScreenProps<RootStackParamList, "List">
 
 const List: FC<ListProps> = React.memo(({ navigation, route }) => {
-  
   const list = route.params.list
   const color = route.params.color
 
@@ -47,17 +44,16 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
   const [refreshing, setRefreshing] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
 
-  const scrollingY = useRef(new Animated.Value(0)).current;
+  const scrollingY = useRef(new Animated.Value(0)).current
   const [listEnd, setListEnd] = useState<LayoutRectangle | null>(null)
 
   const topEdge = listEnd && listEnd.y - height + listEnd.height
 
-  const [initialized, setInitialized] = useState<boolean>(true)
+  const [initialized, setInitialized] = useState<boolean>(false)
 
-  const [editMode, setEditMode] = useState<boolean>(false)
+  const [newTaskAmount, setNewTaskAmount] = useState<Array<number>>([])
 
   //?STARTING POINT
- 
 
   const tasksD = useTypedSelector(
     (state) => state.todo.todoData.find((todolist) => todolist.id === id),
@@ -72,9 +68,9 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
     dispatch(getTasks(id))
     //? This timeout func makes screen open without list items rendering delay
     //? so if you delete this timer, there are will be delay before navigating here
-    // setTimeout(() => {
-    // setInitialized(true)
-    // }, 1)
+    setTimeout(() => {
+    setInitialized(true)
+    }, 1)
     //*
     navigation.setOptions({
       title: list.title,
@@ -94,6 +90,17 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
         navigation.goBack()
       })
     })
+  }
+
+  const addNewTask = () => {
+    if (newTaskAmount.length){
+      console.log(newTaskAmount)
+      const arr = newTaskAmount
+      arr.push(arr[arr.length - 1] - 1)
+      setNewTaskAmount([...arr])
+        
+    }
+    else setNewTaskAmount([0])
   }
 
   const menuHandler = () => {
@@ -123,6 +130,17 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
         }
       )
     }
+    else {
+      Alert.alert(
+        `Delete "${list.title}"`,
+        "Are you sure you want to delete this list?",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Delete", style: "destructive", onPress: deleteList },
+        ],
+        { userInterfaceStyle: dark ? "dark" : "light" }
+      )
+    }
   }
 
   const onRefresh = useCallback(() => {
@@ -137,15 +155,18 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
     <View style={{ height: "100%" }}>
       <Animated.ScrollView
         contentInsetAdjustmentBehavior="automatic"
-        onScroll={Animated.event([
-          {
-            nativeEvent: {
-              contentOffset: {
-                y: scrollingY
-              }
-            }
-          }
-        ], {useNativeDriver: true})}
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: {
+                contentOffset: {
+                  y: scrollingY,
+                },
+              },
+            },
+          ],
+          { useNativeDriver: true }
+        )}
         scrollEventThrottle={16}
         style={{ height: "100%" }}
         refreshControl={
@@ -153,40 +174,57 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
         }
       >
         <View style={{ justifyContent: "center", alignItems: "center" }}>
-        {tasksD && editMode && <Task isCreatingTask={true} listId={tasksD.id} colors={colors} index={0} btnColor={color} />}
 
-          {tasksD?.tasks && initialized && tasksD.tasks.length > 0 ? (
-            <View
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: colors.background,
-                width: "100%",
-              }}
-            >
-              <View>{/* <Text>{tasksD.tasks.length}</Text> */}</View>
-              <View style={{ width: "100%" }}>
-                  {/* <Task isCreatingTask={true} listId={tasksD.id} colors={colors} index={0} btnColor={color} /> */}
-                {tasksD.tasks.map((t, index) => (
-                  <Task
-                    task={t}
-                    btnColor={color}
-                    colors={colors}
-                    key={t.id}
-                    index={index + 1}
-                    listId={tasksD.id}
-                  />
-                ))}
-
-                {/* //?Layout block to start interpolation */}
+          {(tasksD?.tasks && initialized && tasksD.tasks.length > 0) ||
+          (newTaskAmount.length > 0 && initialized) ? (
+            <View style={{width: '100%'}}>
                 <View
-                onLayout={e => {
-                  setListEnd(e.nativeEvent.layout)
-                }}
-                style={{width: '100%', height: barHeight/1.5,
-                //  backgroundColor: 'blue'
-                 }} />
-              </View>
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: colors.background,
+                    width: "100%",
+                  }}
+                >
+                  {/* <Task isCreatingTask={true} listId={tasksD.id} colors={colors} index={0} btnColor={color} /> */}
+                  {tasksD &&
+                    newTaskAmount &&
+                    newTaskAmount.slice(0).reverse().map((nt: number) => {
+                      return (
+                        <Task
+                          key={nt}
+                          isCreatingTask={true}
+                          listId={tasksD.id}
+                          colors={colors}
+                          index={nt}
+                          btnColor={color}
+                        />
+                      )
+                    })}
+                  {tasksD?.tasks &&
+                    tasksD.tasks.map((t, index) => (
+                      <Task
+                        task={t}
+                        btnColor={color}
+                        colors={colors}
+                        key={t.id}
+                        index={index + 1}
+                        listId={tasksD.id}
+                      />
+                    ))}
+
+                  {/* //?Layout block to start interpolation */}
+                  <View
+                    onLayout={(e) => {
+                      setListEnd(e.nativeEvent.layout)
+                    }}
+                    style={{
+                      width: "100%",
+                      height: barHeight / 1.5,
+                      //  backgroundColor: 'blue'
+                    }}
+                  />
+                </View>
               {/* //?/ */}
             </View>
           ) : (
@@ -195,25 +233,30 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
                 <View style={{ marginTop: 12 }}>
                   <ActivityIndicator />
                 </View>
-              ) : (!editMode &&
-                <View>
-                  <Text style={{ color: colors.disabledText }}>
-                    タスクがありません
-                  </Text>
-                </View>
-                
+              ) : (
+                !newTaskAmount.length && (
+                  <View>
+                    <Text style={{ color: colors.disabledText }}>
+                      タスクがありません
+                    </Text>
+                  </View>
+                )
               )}
             </>
           )}
         </View>
-
       </Animated.ScrollView>
-     
-        <BottomToolbar onBtnTouch={() => setEditMode(true)} scrollingY={scrollingY} topEdge={topEdge} accentColor={color} tasksLength={tasksD?.tasks?.length} />
 
-        <StatusBar style="auto" />
+      <BottomToolbar
+        onBtnTouch={() => addNewTask()}
+        scrollingY={scrollingY}
+        topEdge={topEdge}
+        accentColor={color}
+        tasksLength={tasksD?.tasks?.length}
+      />
 
-      </View>
+      <StatusBar style="auto" />
+    </View>
   )
 })
 
