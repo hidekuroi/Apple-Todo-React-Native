@@ -16,6 +16,7 @@ import Card from "../../components/Card"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
 import { SettingsStackParamList } from "../../types/navigation-types"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { clearSettings, setInitializedSettingsList } from "../../features/settings/settings-slice"
 
 type SettingsScreenProps = NativeStackScreenProps<
   SettingsStackParamList,
@@ -29,6 +30,7 @@ const Settings: FC<SettingsScreenProps> = ({ navigation }) => {
 
   const signOutHandler = () => {
     dispatch(signOut())
+    dispatch(clearSettings())
   }
 
   const btnHandler = () => {

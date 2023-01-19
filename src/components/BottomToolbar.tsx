@@ -48,7 +48,7 @@ const BottomToolbar: FC<Props> = ({ topEdge, scrollingY, tasksLength, accentColo
             opacity: tasksLength
               ? topEdge
                 ? scrollingY.interpolate({
-                    inputRange: [topEdge - 20, topEdge],
+                    inputRange: [topEdge - 5, topEdge],
                     outputRange: [1, 0],
                   })
                 : 1

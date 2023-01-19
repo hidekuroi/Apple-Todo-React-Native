@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-native"
 import { todoAPI } from "../../api/todo-api"
-import { getTodos } from "../../features/todo/todo-slice"
+import { createTodolist, getTodos } from "../../features/todo/todo-slice"
 import { useAppDispatch } from "../../hooks/useAppDispatch"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
@@ -22,9 +22,11 @@ type NewListModalProps = NativeStackScreenProps<
 >
 
 const CreateNewListModal: FC<NewListModalProps> = ({ navigation }) => {
-  const { colors, dark } = useMyTheme()
+  const { colors } = useMyTheme()
   const dispatch = useAppDispatch()
   const [title, setTitle] = useState<string>("")
+  const [iconNameValue, setIconNameValue] = useState<string>("")
+  const [colorValue, setColorValue] = useState<string>("")
   const totalCount = useTypedSelector((state) => state.todo.totalCount)
 
   useEffect(() => {
@@ -60,12 +62,12 @@ const CreateNewListModal: FC<NewListModalProps> = ({ navigation }) => {
       ),
     })
     // }
-  }, [title])
+  }, [title, iconNameValue, colorValue])
 
   const createListHandler = () => {
     if (totalCount < 10) {
-      todoAPI.todolistCreate(title).then(() => {
-        dispatch(getTodos())
+      dispatch(createTodolist(title, iconNameValue ? iconNameValue : "list", colorValue ? colorValue : "#356ce2")).then(() => {
+        // dispatch(getTodos())
         navigation.goBack()
       })
     } else {
@@ -89,6 +91,29 @@ const CreateNewListModal: FC<NewListModalProps> = ({ navigation }) => {
               value={title}
               style={{ padding: 4, fontSize: 17, color: colors.text }}
               onChangeText={setTitle}
+            />
+          </View>
+        </View>
+        <View style={[styles.list, { backgroundColor: colors.modalCard }]}>
+          <View style={[styles.listItem, { padding: 10, margin: 5 }]}>
+            <TextInput
+              placeholder="Icon name"
+              defaultValue={iconNameValue}
+              style={{ padding: 4, fontSize: 17, color: colors.text }}
+              onChangeText={(text) => {
+                console.log(iconNameValue)
+                setIconNameValue(text)
+              }}
+            />
+          </View>
+        </View>
+        <View style={[styles.list, { backgroundColor: colors.modalCard }]}>
+          <View style={[styles.listItem, { padding: 10, margin: 5 }]}>
+            <TextInput
+              placeholder="Color"
+              value={colorValue}
+              style={{ padding: 4, fontSize: 17, color: colors.text }}
+              onChangeText={setColorValue}
             />
           </View>
         </View>

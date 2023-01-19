@@ -21,7 +21,7 @@ import {
 import { todoAPI } from "../../api/todo-api"
 import BottomToolbar from "../../components/BottomToolbar"
 import Task from "../../components/Task"
-import { getTasks, getTodos, setError } from "../../features/todo/todo-slice"
+import { deleteTodolist, getTasks, getTodos, setError } from "../../features/todo/todo-slice"
 import { useAppDispatch } from "../../hooks/useAppDispatch"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
@@ -85,10 +85,8 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
   }, [])
 
   const deleteList = () => {
-    todoAPI.todolistDelete(list.id).then(() => {
-      dispatch(getTodos()).then(() => {
-        navigation.goBack()
-      })
+    dispatch(deleteTodolist(list.id)).then(() => {
+      navigation.goBack()
     })
   }
 
@@ -130,7 +128,7 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
         }
       )
     }
-    else {
+    else if(Platform.OS === 'android') {
       Alert.alert(
         `Delete "${list.title}"`,
         "Are you sure you want to delete this list?",
@@ -140,6 +138,13 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
         ],
         { userInterfaceStyle: dark ? "dark" : "light" }
       )
+    }
+
+    //! delete later
+    else if(Platform.OS === 'web') {
+      if(confirm('Are you sure you want to delete this list?')) {
+        deleteList()
+      }
     }
   }
 

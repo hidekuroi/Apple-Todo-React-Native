@@ -1,10 +1,12 @@
+import { SettingType } from './../../types/main-types';
 import { todoAPI } from './../../api/todo-api';
 import { SetTasksPayloadType } from "./../../types/common"
 import { TodoType, UpdateTaskModel } from "../../types/common"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 // import { createAsyncThunk } from "@reduxjs/toolkit"
-import { AppDispatch } from "../../app/store"
+import { AppDispatch, RootState } from "../../app/store"
 import { batch } from "react-redux"
+import { createListSetting, initializeCloudSettings } from '../settings/settings-slice';
 
 interface TodoStateType {
   todoData: Array<TodoType> | []
@@ -67,10 +69,17 @@ export const {
 //*THUNKS
 
 export const getTodos = () => {
-  return async (dispatch: AppDispatch) => {
+  return async (dispatch: AppDispatch, getState: () => RootState) => {
     dispatch(setTodolistsFetching(true))
     try {
-      const response = await todoAPI.getTodolists()
+      let response = await todoAPI.getTodolists()
+      let settingsList: TodoType
+
+      console.log(getState().settings.cloud.isLoaded)
+      response.map(async (list) => {
+        if(list.title === 'SETTINGS' && !getState().settings.cloud.isLoaded) await dispatch(initializeCloudSettings(list))
+      })
+
       batch(() => {
         dispatch(setTodolists(response))
 
@@ -123,6 +132,40 @@ export const createTask = (listId: string, title: string) => {
     catch (e: any) {
       console.log(e)
     }
+  }
+}
+
+export const createTodolist = (title: string, iconName: string, accentColor: string) => {
+  console.log(title, accentColor, iconName)
+  return async (dispatch: AppDispatch) => {
+    console.log(iconName, accentColor)
+    await todoAPI.todolistCreate(title).then((data) => {
+      //! fix types
+      dispatch(createListSetting(data.data.item.id, iconName, accentColor)).then(() => {
+        
+      })
+    })
+    
+  }
+}
+
+export const deleteTodolist = (listId: string) => {
+  return async (dispatch: AppDispatch, getState: () => RootState) => {
+    todoAPI.todolistDelete(listId).then(() => {
+      dispatch(getTodos())
+      //@ts-ignore
+      let settingTask: SettingType = undefined
+
+      getState().settings.cloud.settings.map((s) => {
+        console.log(s.title, listId)
+        if(s.title === listId) {
+          console.log(s)
+          settingTask = s
+        }
+      })
+
+      dispatch(deleteTask(getState().settings.cloud.settingsListId, settingTask.id))
+    })
   }
 }
 

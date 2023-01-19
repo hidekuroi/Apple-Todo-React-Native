@@ -10,14 +10,17 @@ import {
   RefreshControl,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
 } from "react-native"
 import { shallowEqual } from "react-redux"
 import TodolistItem from "../../components/TodolistItem"
+import { getSettings } from "../../features/settings/settings-slice"
 import { getTodos } from "../../features/todo/todo-slice"
 import { useAppDispatch } from "../../hooks/useAppDispatch"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
 import { TodoType } from "../../types/common"
+import { SettingType } from "../../types/main-types"
 import { TodoStackParamList } from "../../types/navigation-types"
 import { deepComparison } from "../../utils/deepComparison"
 
@@ -37,6 +40,9 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
   const isTodolistsFetching = useTypedSelector((state) => {
     return state.todo.isTodolistsFetching
   })
+
+  const settings = useTypedSelector((state) => {return state.settings.cloud.settings})
+  const isSettingsInitialized = useTypedSelector((state) => {return state.settings.cloud.isLoaded})
 
   console.log("TODOS RENDERED")
 
@@ -78,7 +84,9 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true)
-    getLists()
+    await dispatch(getSettings()).then(() => {
+      getLists()
+    })
   }, [])
 
   return (
@@ -96,18 +104,33 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
         ]}
       >
         {/* <Button title='refresh' onPress={onRefresh} /> */}
-        <View style={[styles.list, { backgroundColor: colors.card }]}>
-          {todoData?.map((list: TodoType, index: number) => (
-            <View key={list.id}>
+        {todoData?.length && isSettingsInitialized ? <View style={[styles.list, { backgroundColor: colors.card }]}>
+          {
+          todoData?.map((list: TodoType, index: number) => {
+            //@ts-ignore
+            let listSettings: any = []
+            settings.map((s: SettingType) => {
+              if(s.title === list.id) {
+                let temp = s.description.split(';')
+                temp.map((i) => {
+                  const splitted = i.split('=')
+                  listSettings[splitted[0]] = splitted[1]
+                })
+              }
+            })
+            return <View key={list.id}>
               <TodolistItem
                 text={list.title}
                 helperText={list.totalCount?.toString()}
                 handlePress={(color: string) => listNavigate(list, color)}
                 isLast={index + 1 !== todoData.length}
+                accentColor={listSettings?.accentColor}
+                iconName={listSettings?.iconName}
               />
             </View>
-          ))}
-        </View>
+        })}
+        </View>  : <ActivityIndicator style={{flex: 1,justifyContent: 'center', alignItems: 'center'}} />}
+        
       </View>
       <StatusBar style="auto" />
     </ScrollView>

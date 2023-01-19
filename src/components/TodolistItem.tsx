@@ -7,6 +7,8 @@ type TodolistProps = {
   text: string
   isLast?: boolean
   helperText?: string
+  iconName?: string
+  accentColor?: string
 
   handlePress: (color: string) => void
 }
@@ -16,6 +18,8 @@ const TodolistItem: FC<TodolistProps> = ({
   handlePress,
   isLast = false,
   helperText,
+  iconName,
+  accentColor
 }) => {
   const { colors } = useMyTheme()
 
@@ -54,7 +58,7 @@ const TodolistItem: FC<TodolistProps> = ({
     <TouchableHighlight
       activeOpacity={1}
       underlayColor={colors.touching}
-      onPress={() => handlePress(iconColor)}
+      onPress={() => handlePress(accentColor ? accentColor : iconColor)}
     >
       <View style={styles.item}>
         {/* //?Border radius 8 for square and 50 for ellipse */}
@@ -62,13 +66,13 @@ const TodolistItem: FC<TodolistProps> = ({
           <View
             style={[
               styles.iconBackground,
-              { backgroundColor: iconColor, borderRadius: 50 },
+              { backgroundColor: accentColor ? accentColor : iconColor, borderRadius: 50 },
             ]}
           >
             <View
               style={{
                 position: "absolute",
-                left: 0,
+                left: 1,
                 right: 0,
                 top: 0,
                 bottom: 0,
@@ -76,7 +80,8 @@ const TodolistItem: FC<TodolistProps> = ({
                 alignItems: "center",
               }}
             >
-              <Ionicons size={20} color={"white"} name="list" />
+              {/* @ts-ignore */}
+              <Ionicons size={20} color={"white"} name={iconName ? iconName : "list"} />
             </View>
           </View>
         </View>

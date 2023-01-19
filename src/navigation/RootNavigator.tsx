@@ -25,7 +25,7 @@ const RootNavigator = () => {
 
   return (
     <RootStack.Navigator initialRouteName="Auth">
-      {isAuth ? (
+      {isAuth && isInitialized ? (
         <RootStack.Group>
           <RootStack.Screen
             name="MainTabNavigator"
