@@ -20,7 +20,8 @@ export const defaultColors = {
   inputPlaceholder: "rgb(142, 142, 147)",
   modalBackground: "rgb(242, 242, 246)",
   modalCard: "rgb(255, 255, 255)",
-  modalInput: "rgb(228, 228, 229)",
+  modalInput: "rgb(244, 244, 245)",
+  modalInputActive: "rgb(228, 228, 229)",
 
   // test: PlatformColor("secondaryLabel"),
   test: "black",
@@ -40,7 +41,8 @@ export const darkColors: ColorsType = {
   inputPlaceholder: "rgb(142, 142, 147)",
   modalBackground: "rgb(28, 28, 30)",
   modalCard: "rgb(44, 44, 46)",
-  modalInput: "rgb(71, 71, 75)",
+  modalInput: "rgb(57, 57, 61)",
+  modalInputActive: "rgb(71, 71, 75)",
 
   // test: PlatformColor("secondaryLabel"),
   test: "white"
@@ -61,6 +63,7 @@ export const draculaMintColors: ColorsType = {
   modalBackground: "#292d3e",
   modalCard: "#212432",
   modalInput: "#292d3e",
+  modalInputActive: "#292d3e",
 
   test: 'white'
 }

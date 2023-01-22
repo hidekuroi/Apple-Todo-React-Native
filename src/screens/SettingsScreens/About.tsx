@@ -9,7 +9,7 @@ const About: FC = () => {
   const { colors } = useMyTheme()
   const headerHeight = useHeaderHeight()
 
-  const [version, setVersion] = useState(["0.1.7", "etude"])
+  const [version, setVersion] = useState(["0.1.8", "etude"])
 
   return (
     <ScrollView
