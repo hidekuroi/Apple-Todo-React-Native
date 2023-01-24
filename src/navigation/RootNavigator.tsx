@@ -10,6 +10,7 @@ import { RootStackParamList } from "../types/navigation-types"
 import { initializeApp } from "../features/appstate/appstate-slice"
 import Loading from "../screens/Loading"
 import List from "../screens/TodoScreens/List"
+import CreateNewListModal from "../screens/TodoScreens/CreateNewListModal"
 
 const RootNavigator = () => {
   const RootStack = createNativeStackNavigator<RootStackParamList>()
@@ -43,6 +44,20 @@ const RootNavigator = () => {
               headerLargeStyle: { backgroundColor: colors.background },
               headerTransparent: Platform.OS === "ios" ? true : false,
               headerBlurEffect: "systemMaterial",
+            }}
+          />
+          <RootStack.Screen
+            name="CreateNewListModal"
+            component={CreateNewListModal}
+            options={{
+              headerTransparent: Platform.OS === "ios" ? true : false,
+              headerBlurEffect: "systemMaterial",
+
+              title: "New todolist",
+              presentation: "modal",
+              headerLargeTitle: false,
+              headerLargeStyle: { backgroundColor: colors.modalBackground },
+              // gestureEnabled: false,
             }}
           />
         </RootStack.Group>

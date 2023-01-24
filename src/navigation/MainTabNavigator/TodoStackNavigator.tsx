@@ -39,18 +39,6 @@ const TodoStackNavigator = () => {
         }}
       />
 
-      <TodoStack.Screen
-        name="CreateNewListModal"
-        component={CreateNewListModal}
-        options={{
-          title: "New todolist",
-          presentation: "modal",
-          headerLargeTitle: false,
-          headerLargeStyle: { backgroundColor: colors.modalBackground },
-          // gestureEnabled: false,
-        }}
-      />
-
       {/* <TodoStack.Screen
         name="List"
         component={List}

@@ -6,9 +6,19 @@ export type RootStackParamList = {
   List: {
     list: TodoType
     color: string
+    settings?: {
+      iconNameValue: string,
+      colorValue: string
+    }
   }
   Auth: undefined
   Loading: undefined
+  CreateNewListModal: {
+    iconNameValue?: string,
+    colorValue?: string,
+    todolistId?: string,
+    title?: string
+  }
 }
 
 export type MainTabParamList = {
@@ -18,7 +28,7 @@ export type MainTabParamList = {
 
 export type TodoStackParamList = {
   Todos: undefined
-  CreateNewListModal: undefined
+  
   // List: {
   //   list: TodoType
   //   color: string
@@ -30,4 +40,5 @@ export type SettingsStackParamList = {
   About: undefined
   Appearence: undefined
   Profile: undefined
+  TodoSettings: undefined
 }

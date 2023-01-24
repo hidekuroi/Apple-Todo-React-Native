@@ -19,8 +19,7 @@ import { getTodos } from "../../features/todo/todo-slice"
 import { useAppDispatch } from "../../hooks/useAppDispatch"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
-import { TodoType } from "../../types/common"
-import { SettingType } from "../../types/main-types"
+import { TasksType, TodoType } from "../../types/common"
 import { TodoStackParamList } from "../../types/navigation-types"
 import { deepComparison } from "../../utils/deepComparison"
 
@@ -41,7 +40,9 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
     return state.todo.isTodolistsFetching
   })
 
-  const settings = useTypedSelector((state) => {return state.settings.cloud.settings})
+  const cloudSettings = useTypedSelector((state) => {return state.settings.cloud.settings})
+  const localSettings = useTypedSelector((state) => state.settings.local)
+
   const isSettingsInitialized = useTypedSelector((state) => {return state.settings.cloud.isLoaded})
 
   console.log("TODOS RENDERED")
@@ -56,7 +57,7 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
         headerRight: () => (
           <View>
             <TouchableOpacity
-              onPress={() => navigation.navigate("CreateNewListModal")}
+              onPress={() => navigation.navigate("CreateNewListModal", {})}
             >
               <Ionicons name="add" color={colors.primary} size={32} />
             </TouchableOpacity>
@@ -78,8 +79,8 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
     dispatch(getTodos())
   }
 
-  const listNavigate = (list: TodoType, color = colors.text) => {
-    navigation.navigate("List", { list, color })
+  const listNavigate = (list: TodoType, color = colors.text, settings: any) => {
+    navigation.navigate("List", { list, color, settings: {iconNameValue: settings.iconNameValue, colorValue: settings.colorValue} })
   }
 
   const onRefresh = useCallback(async () => {
@@ -105,11 +106,13 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
       >
         {/* <Button title='refresh' onPress={onRefresh} /> */}
         {todoData?.length && isSettingsInitialized ? <View style={[styles.list, { backgroundColor: colors.card }]}>
+          <>
+          {console.log('REAL RENDER')}
           {
           todoData?.map((list: TodoType, index: number) => {
             //@ts-ignore
             let listSettings: any = []
-            settings.map((s: SettingType) => {
+            cloudSettings.map((s: TasksType) => {
               if(s.title === list.id) {
                 let temp = s.description.split(';')
                 temp.map((i) => {
@@ -118,17 +121,18 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
                 })
               }
             })
-            return <View key={list.id}>
+            return <View key={list.id} style={{display: list.title === 'SETTINGS' ? (localSettings.isSettingsListVisible ? 'flex' : 'none') : 'flex'}}>
               <TodolistItem
                 text={list.title}
                 helperText={list.totalCount?.toString()}
-                handlePress={(color: string) => listNavigate(list, color)}
+                handlePress={(color: string) => listNavigate(list, color, {iconNameValue: listSettings?.iconName, colorValue: listSettings?.accentColor})}
                 isLast={index + 1 !== todoData.length}
                 accentColor={listSettings?.accentColor}
                 iconName={listSettings?.iconName}
+                isSquare={localSettings.isSquareIcons}
               />
             </View>
-        })}
+        })}</>
         </View>  : <ActivityIndicator style={{flex: 1,justifyContent: 'center', alignItems: 'center'}} />}
         
       </View>

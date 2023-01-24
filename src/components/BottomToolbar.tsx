@@ -19,7 +19,7 @@ type Props = {
   onBtnTouch: () => void
 }
 
-const BottomToolbar: FC<Props> = ({ topEdge, scrollingY, tasksLength, accentColor='blue', onBtnTouch }) => {
+const BottomToolbar: FC<Props> = ({ topEdge, scrollingY, tasksLength, accentColor, onBtnTouch }) => {
   // const tabBarHeight = useBottomTabBarHeight()
   const barHeight = useHeaderHeight()
   const { colors, dark } = useMyTheme()
@@ -68,8 +68,8 @@ const BottomToolbar: FC<Props> = ({ topEdge, scrollingY, tasksLength, accentColo
       }
       <View style={{flexDirection: 'row', alignItems: 'center', width: '100%', height: '100%'}}>
         <TouchableOpacity onPress={onBtnTouch} style={{flexDirection: 'row', paddingHorizontal: '2.5%', height: '100%', alignItems: 'center'}}>
-            <Ionicons name='add-circle' size={30} color={accentColor} />
-            <Text style={{ color: accentColor, marginLeft: 10, fontSize: 17,  }}>New task</Text>
+            <Ionicons name='add-circle' size={30} color={accentColor ? accentColor : colors.primary} />
+            <Text style={{ color: accentColor ? accentColor : colors.primary, marginLeft: 10, fontSize: 17,  }}>New task</Text>
         </TouchableOpacity>
       </View>
     </Animated.View>

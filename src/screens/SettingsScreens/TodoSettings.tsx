@@ -1,25 +1,25 @@
 import { useHeaderHeight } from "@react-navigation/elements"
 import { StatusBar } from "expo-status-bar"
 import React, { FC, useState } from "react"
-import { View, Text, ScrollView, Button, Platform } from "react-native"
+import { View, ScrollView } from "react-native"
 import Card from "../../components/Card"
 import { editLocalSetting } from "../../features/settings/settings-slice"
 import { useAppDispatch } from "../../hooks/useAppDispatch"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
 
-const Appearence: FC = () => {
-  const { colors, dark } = useMyTheme()
+const TodoSettings: FC = () => {
+  const { colors } = useMyTheme()
   const headerHeight = useHeaderHeight()
   const dispatch = useAppDispatch()
 
-  const setting = useTypedSelector((state) => state.settings.local.isSquareIcons)
+  const isSettingsListVisible = useTypedSelector((state) => state.settings.local.isSettingsListVisible)
 
-  const [value, setValue] = useState(setting)
+  const [value, setValue] = useState<boolean>(isSettingsListVisible)
 
   const switchHandler = () => {
     setValue(!value)
-    dispatch(editLocalSetting({settingName: 'isSquareIcons', settingValue: !value}))
+    dispatch(editLocalSetting({settingName: 'isSettingsListVisible', settingValue: !value}))
   }
 
   return (
@@ -35,25 +35,17 @@ const Appearence: FC = () => {
         }}
       >
         <Card>
-          <Card.Item text="Theme" helperText={dark ? "Dark" : "Light"} isLast />
-        </Card>
-        <Card>
           <Card.Item
-            text="Square icons"
-            isLast
+            text="Visible settings list"
             switchValue={value}
             onSwitch={() => switchHandler()}
+            isLast
           />
         </Card>
-        <Text
-          style={{ color: Platform.OS === "ios" ? colors.test : colors.text }}
-        >
-          Platform colors
-        </Text>
       </View>
       <StatusBar style="auto" />
     </ScrollView>
   )
 }
 
-export default Appearence
+export default TodoSettings

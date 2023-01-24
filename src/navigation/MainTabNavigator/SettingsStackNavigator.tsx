@@ -7,6 +7,7 @@ import About from "../../screens/SettingsScreens/About"
 import Appearence from "../../screens/SettingsScreens/Appearence"
 import Profile from "../../screens/SettingsScreens/Profile"
 import { SettingsStackParamList } from "../../types/navigation-types"
+import TodoSettings from "../../screens/SettingsScreens/TodoSettings"
 
 const SettingsStackNavigator = () => {
   const SettingsStack = createNativeStackNavigator<SettingsStackParamList>()
@@ -34,6 +35,7 @@ const SettingsStackNavigator = () => {
       <SettingsStack.Screen name="About" component={About} />
       <SettingsStack.Screen name="Appearence" component={Appearence} />
       <SettingsStack.Screen name="Profile" component={Profile} />
+      <SettingsStack.Screen name="TodoSettings" component={TodoSettings} options={{title: 'Todo settings'}} />
     </SettingsStack.Navigator>
   )
 }

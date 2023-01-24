@@ -12,27 +12,31 @@ import {
 } from "react-native"
 import { todoAPI } from "../../api/todo-api"
 import Card from "../../components/Card"
+import { createListSetting, editListSetting } from "../../features/settings/settings-slice"
 import { createTodolist, getTodos } from "../../features/todo/todo-slice"
 import { useAppDispatch } from "../../hooks/useAppDispatch"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
-import { TodoStackParamList } from "../../types/navigation-types"
+import { RootStackParamList, TodoStackParamList } from "../../types/navigation-types"
 import Colorpicker from "./Colorpicker"
 import Iconpicker from "./Iconpicker"
 
 type NewListModalProps = NativeStackScreenProps<
-  TodoStackParamList,
+  RootStackParamList,
   "CreateNewListModal"
 >
 
-const CreateNewListModal: FC<NewListModalProps> = ({ navigation }) => {
+const CreateNewListModal: FC<NewListModalProps> = ({ navigation, route }) => {
+  const routeProps = route.params
   const { colors } = useMyTheme()
   const dispatch = useAppDispatch()
-  const [title, setTitle] = useState<string>("")
-  const [iconNameValue, setIconNameValue] = useState<string>("list")
-  const [colorValue, setColorValue] = useState<string>("#0a84fe")
+  const todolistId = routeProps?.todolistId || ''
+  const [title, setTitle] = useState<string>(routeProps?.title || "")
+  const [iconNameValue, setIconNameValue] = useState<string>(routeProps?.iconNameValue || "list")
+  const [colorValue, setColorValue] = useState<string>(routeProps?.colorValue || "#0a84fe")
   const [isInputActive, setIsInputActive] = useState<boolean>(false)
   const totalCount = useTypedSelector((state) => state.todo.totalCount)
+  const localSettings = useTypedSelector((state) => state.settings.local)
 
   useEffect(() => {
     navigation.setOptions({
@@ -45,6 +49,9 @@ const CreateNewListModal: FC<NewListModalProps> = ({ navigation }) => {
       ),
       headerRight: () => <Button title="Done" disabled />,
     })
+    if(title) {
+      navigation.setOptions({title: 'Edit'})
+    }
   }, [])
 
   useEffect(() => {
@@ -78,21 +85,32 @@ const CreateNewListModal: FC<NewListModalProps> = ({ navigation }) => {
   }
 
   const createListHandler = () => {
-    if (totalCount < 10) {
-      dispatch(
-        createTodolist(
-          title,
-          iconNameValue ? iconNameValue : "list",
-          colorValue ? colorValue : "#0a84fe"
-        )
-      ).then(() => {
-        // dispatch(getTodos())
+    if(!todolistId.length) {
+      if (totalCount < 10) {
+        dispatch(
+          createTodolist(
+            title,
+            iconNameValue ? iconNameValue : "list",
+            colorValue ? colorValue : "#0a84fe"
+          )
+        ).then(() => {
+          // dispatch(getTodos())
+          navigation.goBack()
+        })
+      } else {
+        Alert.alert("Limit", "You now have max possible number of lists", [
+          { text: "Ok" },
+        ])
+      }
+    }
+    else {
+      if(title !== routeProps.title || iconNameValue !== routeProps.iconNameValue || colorValue !== routeProps.colorValue) {
+        dispatch(editListSetting(todolistId, iconNameValue, colorValue, (title !== routeProps.title ? title : undefined)))
         navigation.goBack()
-      })
-    } else {
-      Alert.alert("Limit", "You now have max possible number of lists", [
-        { text: "Ok" },
-      ])
+      }
+      else {
+        navigation.goBack()
+      }
     }
   }
 
@@ -104,7 +122,7 @@ const CreateNewListModal: FC<NewListModalProps> = ({ navigation }) => {
       style={{ backgroundColor: colors.modalBackground }}
     >
       <View style={{ justifyContent: "center", alignItems: "center" }}>
-        <View style={[styles.list, { backgroundColor: colors.modalCard }]}>
+        <View style={[styles.list, { backgroundColor: colors.modalCard, marginTop: 10 }]}>
           <View
             style={[styles.listItem, { width: "91.5%", alignItems: "center", marginBottom: 20, marginTop: 10 }]}
           >
@@ -117,7 +135,7 @@ const CreateNewListModal: FC<NewListModalProps> = ({ navigation }) => {
                 shadowRadius: 10,
                 width: 100,
                 height: 100,
-                borderRadius: 50,
+                borderRadius: localSettings.isSquareIcons ? 8 : 50,
                 opacity: 1,
               }}
             >
@@ -146,7 +164,7 @@ const CreateNewListModal: FC<NewListModalProps> = ({ navigation }) => {
               style={{
                 padding: 4,
                 fontSize: 24,
-                color: colors.text,
+                color: colorValue,
                 backgroundColor: isInputActive ? colors.modalInputActive : colors.modalInput,
                 borderRadius: 11,
                 fontWeight: "bold",
@@ -162,11 +180,11 @@ const CreateNewListModal: FC<NewListModalProps> = ({ navigation }) => {
         </View>
 
         <View style={[styles.list, { backgroundColor: colors.modalCard }]}>
-          <Colorpicker setColor={(color: string) => setColor(color)} />
+          <Colorpicker initialColor={colorValue} setColor={(color: string) => setColor(color)} />
         </View>
 
         <View style={[styles.list, { backgroundColor: colors.modalCard }]}>
-          <Iconpicker setIcon={(icon: string) => setIcon(icon)} />
+          <Iconpicker initialIcon={iconNameValue} setIcon={(icon: string) => setIcon(icon)} />
         </View>
 
       </View>

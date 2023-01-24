@@ -9,6 +9,7 @@ type TodolistProps = {
   helperText?: string
   iconName?: string
   accentColor?: string
+  isSquare?: boolean
 
   handlePress: (color: string) => void
 }
@@ -19,7 +20,8 @@ const TodolistItem: FC<TodolistProps> = ({
   isLast = false,
   helperText,
   iconName,
-  accentColor
+  accentColor,
+  isSquare
 }) => {
   const { colors } = useMyTheme()
 
@@ -63,16 +65,16 @@ const TodolistItem: FC<TodolistProps> = ({
       <View style={styles.item}>
         {/* //?Border radius 8 for square and 50 for ellipse */}
         <View style={[styles.iconPartWrapper]}>
-          <View
+          {text !== 'SETTINGS' && <View
             style={[
               styles.iconBackground,
-              { backgroundColor: accentColor ? accentColor : iconColor, borderRadius: 50 },
+              { backgroundColor: accentColor ? accentColor : iconColor, borderRadius: isSquare ? 8 : 50 },
             ]}
           >
             <View
               style={{
                 position: "absolute",
-                left: 1,
+                left: 1.7,
                 right: 0,
                 top: 0,
                 bottom: 0,
@@ -83,7 +85,7 @@ const TodolistItem: FC<TodolistProps> = ({
               {/* @ts-ignore */}
               <Ionicons size={20} color={"white"} name={iconName ? iconName : "list"} />
             </View>
-          </View>
+          </View>}
         </View>
 
         <View

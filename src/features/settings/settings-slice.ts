@@ -1,13 +1,22 @@
-import { CloudSettingsType, SettingType } from "./../../types/main-types"
+import { CloudSettingsType } from "./../../types/main-types"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { AppDispatch, RootState } from "../../app/store"
 import { TasksType, TodoType, UpdateTaskModel } from "../../types/common"
 import { todoAPI } from "../../api/todo-api"
-import { changeTask, createTask, getTodos } from "../todo/todo-slice"
+import {
+  changeTask,
+  createTask,
+  getTodos,
+  renameTodolist,
+} from "../todo/todo-slice"
+import { batch } from "react-redux"
 
 interface SettingsStateType {
   cloud: CloudSettingsType
-  local: null
+  local: {
+    isSettingsListVisible: boolean,
+    isSquareIcons: boolean
+  }
 }
 
 const initialState: SettingsStateType = {
@@ -17,7 +26,10 @@ const initialState: SettingsStateType = {
     settings: [],
     isLoaded: false,
   },
-  local: null,
+  local: {
+    isSettingsListVisible: false,
+    isSquareIcons: false
+  },
 }
 
 //*REDUCER
@@ -30,15 +42,10 @@ const settingsSlice = createSlice({
       state.cloud.settingsListId = action.payload.id
       state.cloud.settingsListTitle = action.payload.title
 
-      let settings: SettingType[] = []
+      let settings: TasksType[] = []
       if (action.payload.tasks.length) {
         for (let i = 0; i < action.payload.tasks.length; i++) {
-          settings.push({
-            description: action.payload.tasks[i].description,
-            id: action.payload.tasks[i].id,
-            status: action.payload.tasks[i].status,
-            title: action.payload.tasks[i].title,
-          })
+          settings.push(action.payload.tasks[i])
         }
       }
       state.cloud.settings = settings
@@ -46,29 +53,55 @@ const settingsSlice = createSlice({
       state.cloud.isLoaded = true
     },
     setSettings(state, action: PayloadAction<TasksType[]>) {
-      let settings: SettingType[] = []
+      let settings: TasksType[] = []
       if (action.payload.length) {
         for (let i = 0; i < action.payload.length; i++) {
-          settings.push({
-            description: action.payload[i].description,
-            id: action.payload[i].id,
-            status: action.payload[i].status,
-            title: action.payload[i].title,
-          })
+          settings.push(action.payload[i])
         }
       }
       state.cloud.settings = settings
     },
     clearSettings(state) {
       state.cloud.settings = []
-      state.cloud.settingsListId = ''
-      state.cloud.settingsListTitle = ''
+      state.cloud.settingsListId = ""
+      state.cloud.settingsListTitle = ""
       state.cloud.isLoaded = false
+
+      state.local.isSettingsListVisible = false
+    },
+    editSetting(
+      state,
+      action: PayloadAction<{ name: string; description: string }>
+    ) {
+      for (let i = 0; i < state.cloud.settings.length; i++) {
+        if (state.cloud.settings[i].title === action.payload.name)
+          state.cloud.settings[i].description = action.payload.description
+      }
+    },
+    editLocalSetting(state, action: PayloadAction<{settingName: string, settingValue: any}>) {
+      switch (action.payload.settingName) {
+        case 'isSettingsListVisible':
+          state.local.isSettingsListVisible = action.payload.settingValue
+          break;
+
+        case 'isSquareIcons':
+          state.local.isSquareIcons = action.payload.settingValue
+          break;
+      
+        default:
+          break;
+      }
     }
   },
 })
 
-export const { setInitializedSettingsList, setSettings, clearSettings } = settingsSlice.actions
+export const {
+  setInitializedSettingsList,
+  setSettings,
+  clearSettings,
+  editSetting,
+  editLocalSetting
+} = settingsSlice.actions
 
 //*THUNKS
 
@@ -108,9 +141,64 @@ export const createListSetting = (
         description: `iconName=${iconName};accentColor=${accentColor}`,
       }
 
-      await dispatch(changeTask(settingsListId, settingTask.item.id, updatedSettingTask))
+      await dispatch(
+        changeTask(settingsListId, settingTask.item.id, updatedSettingTask)
+      )
       await dispatch(getSettings())
       dispatch(getTodos())
+    }
+  }
+}
+
+export const editListSetting = (
+  todolistId: string,
+  iconName: string,
+  accentColor: string,
+  title?: string
+) => {
+  return async (dispatch: AppDispatch, getState: () => RootState) => {
+    let updatedSettingTask: TasksType | null = null
+    getState().settings.cloud.settings.map((s: TasksType) => {
+      if (s.title === todolistId) {
+        updatedSettingTask = {
+          //@ts-ignore
+          ...s,
+          description: `iconName=${iconName};accentColor=${accentColor}`,
+        }
+      }
+    })
+    if (updatedSettingTask) {
+      await dispatch(
+        changeTask(
+          //@ts-ignore
+          updatedSettingTask.todoListId,
+          //@ts-ignore
+          updatedSettingTask.id,
+          updatedSettingTask
+        )
+      )
+      if (title) {
+        batch(() => {
+          dispatch(renameTodolist(title, todolistId))
+          dispatch(
+            editSetting({
+              name: todolistId,
+              //@ts-ignore
+              description: updatedSettingTask.description,
+            })
+          )
+        })
+      } else {
+        dispatch(
+          editSetting({
+            name: todolistId,
+            //@ts-ignore
+            description: updatedSettingTask.description,
+          })
+        )
+      }
+
+      // dispatch(getTodos())
     }
   }
 }

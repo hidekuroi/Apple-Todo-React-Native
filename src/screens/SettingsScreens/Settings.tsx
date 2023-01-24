@@ -100,8 +100,7 @@ const Settings: FC<SettingsScreenProps> = ({ navigation }) => {
           />
           <Card.Item
             text="Todo settings"
-            disabled
-            onPress={() => console.log("dixy")}
+            onPress={() => navigation.navigate("TodoSettings")}
             isLast
             icon={{ iconName: "list", shape: "square", color: "#ff5000" }}
             chevron

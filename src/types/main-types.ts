@@ -1,13 +1,8 @@
-export interface SettingType {
-  description: string
-  title: string
-  status: number
-  id: string
-}
+import { TasksType } from "./common"
 
 export interface CloudSettingsType {
     settingsListId: string,
     settingsListTitle: string,
-    settings: SettingType[] | [],
+    settings: TasksType[] | [],
     isLoaded: boolean
 }

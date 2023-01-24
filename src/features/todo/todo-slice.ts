@@ -1,4 +1,3 @@
-import { SettingType } from './../../types/main-types';
 import { todoAPI } from './../../api/todo-api';
 import { SetTasksPayloadType } from "./../../types/common"
 import { TodoType, UpdateTaskModel } from "../../types/common"
@@ -55,6 +54,13 @@ const todoSlice = createSlice({
         }
       }
     },
+
+    renameList(state, action: PayloadAction<{title:string, todolistId: string}>) {
+      for (let i = 0; i < state.todoData.length; i++) {
+        if(state.todoData[i].id === action.payload.todolistId) state.todoData[i].title = action.payload.title
+        console.log('uebok')
+      }
+    }
   },
 })
 
@@ -64,6 +70,7 @@ export const {
   setTodolists,
   setTotalCount,
   setTasks,
+  renameList,
 } = todoSlice.actions
 
 //*THUNKS
@@ -166,6 +173,13 @@ export const deleteTodolist = (listId: string) => {
 
       dispatch(deleteTask(getState().settings.cloud.settingsListId, settingTask.id))
     })
+  }
+}
+
+export const renameTodolist = (title: string, listId: string) => {
+  return async (dispatch: AppDispatch) => {
+    dispatch(renameList({title, todolistId: listId}))
+    await todoAPI.todolistRename(title, listId)
   }
 }
 
