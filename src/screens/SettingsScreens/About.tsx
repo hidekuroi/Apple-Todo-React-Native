@@ -3,13 +3,15 @@ import { StatusBar } from "expo-status-bar"
 import React, { FC, useState } from "react"
 import { View, ScrollView } from "react-native"
 import Card from "../../components/Card"
+import { useLocale } from "../../hooks/useLocale"
 import { useMyTheme } from "../../hooks/useMyTheme"
 
 const About: FC = () => {
   const { colors } = useMyTheme()
   const headerHeight = useHeaderHeight()
+  const i18n = useLocale()
 
-  const [version, setVersion] = useState(["0.1.9", "etude"])
+  const [version, setVersion] = useState(["0.2.0", "etude"])
 
   return (
     <ScrollView
@@ -25,7 +27,7 @@ const About: FC = () => {
       >
         <Card>
           <Card.Item
-            text="Version"
+            text={i18n.t('aboutVersion')}
             helperText={version[0]}
             onPress={() => setVersion([version[1], version[0]])}
             isLast

@@ -5,6 +5,7 @@ import { View, ScrollView } from "react-native"
 import Card from "../../components/Card"
 import { editLocalSetting } from "../../features/settings/settings-slice"
 import { useAppDispatch } from "../../hooks/useAppDispatch"
+import { useLocale } from "../../hooks/useLocale"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
 
@@ -12,14 +13,22 @@ const TodoSettings: FC = () => {
   const { colors } = useMyTheme()
   const headerHeight = useHeaderHeight()
   const dispatch = useAppDispatch()
+  const i18n = useLocale()
 
-  const isSettingsListVisible = useTypedSelector((state) => state.settings.local.isSettingsListVisible)
+  const isSettingsListVisible = useTypedSelector(
+    (state) => state.settings.local.isSettingsListVisible
+  )
 
   const [value, setValue] = useState<boolean>(isSettingsListVisible)
 
   const switchHandler = () => {
     setValue(!value)
-    dispatch(editLocalSetting({settingName: 'isSettingsListVisible', settingValue: !value}))
+    dispatch(
+      editLocalSetting({
+        settingName: "isSettingsListVisible",
+        settingValue: !value,
+      })
+    )
   }
 
   return (
@@ -36,7 +45,7 @@ const TodoSettings: FC = () => {
       >
         <Card>
           <Card.Item
-            text="Visible settings list"
+            text={i18n.t('todosettingsVisibleList')}
             switchValue={value}
             onSwitch={() => switchHandler()}
             isLast

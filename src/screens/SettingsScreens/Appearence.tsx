@@ -1,10 +1,11 @@
 import { useHeaderHeight } from "@react-navigation/elements"
 import { StatusBar } from "expo-status-bar"
 import React, { FC, useState } from "react"
-import { View, Text, ScrollView, Button, Platform } from "react-native"
+import { View, Text, ScrollView, Platform } from "react-native"
 import Card from "../../components/Card"
 import { editLocalSetting } from "../../features/settings/settings-slice"
 import { useAppDispatch } from "../../hooks/useAppDispatch"
+import { useLocale } from "../../hooks/useLocale"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
 
@@ -13,13 +14,19 @@ const Appearence: FC = () => {
   const headerHeight = useHeaderHeight()
   const dispatch = useAppDispatch()
 
-  const setting = useTypedSelector((state) => state.settings.local.isSquareIcons)
+  const setting = useTypedSelector(
+    (state) => state.settings.local.isSquareIcons
+  )
 
   const [value, setValue] = useState(setting)
 
+  const i18n = useLocale()
+
   const switchHandler = () => {
     setValue(!value)
-    dispatch(editLocalSetting({settingName: 'isSquareIcons', settingValue: !value}))
+    dispatch(
+      editLocalSetting({ settingName: "isSquareIcons", settingValue: !value })
+    )
   }
 
   return (
@@ -35,11 +42,11 @@ const Appearence: FC = () => {
         }}
       >
         <Card>
-          <Card.Item text="Theme" helperText={dark ? "Dark" : "Light"} isLast />
+          <Card.Item text={i18n.t('appearenceTheme')} helperText={dark ? i18n.t('appearenceDark') : i18n.t('appearenceLight')} isLast />
         </Card>
         <Card>
           <Card.Item
-            text="Square icons"
+            text={i18n.t('appearenceIcons')}
             isLast
             switchValue={value}
             onSwitch={() => switchHandler()}
@@ -50,6 +57,7 @@ const Appearence: FC = () => {
         >
           Platform colors
         </Text>
+        <Text style={{color: colors.text}}>{i18n.t('test')}</Text>
       </View>
       <StatusBar style="auto" />
     </ScrollView>

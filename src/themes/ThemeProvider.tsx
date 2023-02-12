@@ -12,7 +12,7 @@ export const ThemeContext = createContext({
 export const ThemeProvider = (props: any) => {
   let colorScheme = useColorScheme()
   //
-  Platform.OS === "web" ? (colorScheme = "dark") : (colorScheme = colorScheme)
+  Platform.OS === "web" ? (colorScheme = "light") : (colorScheme = colorScheme)
   //
   const [isDark, setIsDark] = useState(colorScheme === "dark")
 

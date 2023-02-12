@@ -9,16 +9,18 @@ import {
 } from "./src/themes/ReactNavigationThemes"
 import { ThemeProvider } from "./src/themes/ThemeProvider"
 import RootNavigator from "./src/navigation/RootNavigator"
+import { LocaleProvider } from "./src/localization/LocaleProvider"
 
 export default function App() {
   let scheme = useColorScheme()
 
   //
-  Platform.OS === "web" ? (scheme = "dark") : (scheme = scheme)
+  Platform.OS === "web" ? (scheme = "light") : (scheme = scheme)
   //
 
   return (
     <Provider store={store}>
+      <LocaleProvider>
       <ThemeProvider>
         <NavigationContainer
           theme={
@@ -30,6 +32,7 @@ export default function App() {
           <RootNavigator />
         </NavigationContainer>
       </ThemeProvider>
+      </LocaleProvider>
     </Provider>
   )
 }

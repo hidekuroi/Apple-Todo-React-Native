@@ -1,4 +1,4 @@
-import { TodoType } from "./common"
+import { TasksType, TodoType } from "./common"
 import { NavigatorScreenParams } from "@react-navigation/native"
 
 export type RootStackParamList = {
@@ -7,18 +7,29 @@ export type RootStackParamList = {
     list: TodoType
     color: string
     settings?: {
-      iconNameValue: string,
+      iconNameValue: string
       colorValue: string
     }
   }
   Auth: undefined
   Loading: undefined
   CreateNewListModal: {
-    iconNameValue?: string,
-    colorValue?: string,
-    todolistId?: string,
+    iconNameValue?: string
+    colorValue?: string
+    todolistId?: string
     title?: string
   }
+  TaskInfoNavigator: {task?: TasksType}
+}
+
+export type TaskInfoParamList = {
+  TaskInfo: {
+    listId?: string,
+    taskId?: string,
+    task?: TasksType
+  }
+  TaskDetails: undefined
+  SelectList: {todoData: Array<TodoType>, cloudSettings: any, isEditTask?: boolean}
 }
 
 export type MainTabParamList = {
@@ -28,7 +39,7 @@ export type MainTabParamList = {
 
 export type TodoStackParamList = {
   Todos: undefined
-  
+
   // List: {
   //   list: TodoType
   //   color: string

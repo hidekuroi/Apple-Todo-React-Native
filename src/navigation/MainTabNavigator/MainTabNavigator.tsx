@@ -7,11 +7,13 @@ import { useMyTheme } from "../../hooks/useMyTheme"
 import TodoStackNavigator from "./TodoStackNavigator"
 import SettingsStackNavigator from "./SettingsStackNavigator"
 import { MainTabParamList } from "../../types/navigation-types"
+import { useLocale } from "../../hooks/useLocale"
 
 const MainTabNavigator = () => {
   const MainTab = createBottomTabNavigator<MainTabParamList>()
 
   const { dark } = useMyTheme()
+  const i18n = useLocale()
 
   return (
     <MainTab.Navigator
@@ -35,7 +37,7 @@ const MainTabNavigator = () => {
         name="TodoStackNavigator"
         component={TodoStackNavigator}
         options={{
-          tabBarLabel: "Todo",
+          tabBarLabel: i18n.t('todoTab'),
           tabBarIcon: ({ size, color, focused }) => (
             <Ionicons
               name={focused ? "checkbox" : "checkbox-outline"}
@@ -49,7 +51,7 @@ const MainTabNavigator = () => {
         name="SettingsStackNavigator"
         component={SettingsStackNavigator}
         options={{
-          tabBarLabel: "Settings",
+          tabBarLabel: i18n.t('settingsTab'),
           tabBarIcon: ({ size, color, focused }) => (
             <Ionicons
               name={focused ? "cog" : "cog-outline"}

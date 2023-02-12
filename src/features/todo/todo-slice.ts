@@ -5,7 +5,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 // import { createAsyncThunk } from "@reduxjs/toolkit"
 import { AppDispatch, RootState } from "../../app/store"
 import { batch } from "react-redux"
-import { createListSetting, initializeCloudSettings } from '../settings/settings-slice';
+import { createListSetting, initializeCloudSettings, setSelectedListId } from '../settings/settings-slice';
 
 interface TodoStateType {
   todoData: Array<TodoType> | []
@@ -80,16 +80,36 @@ export const getTodos = () => {
     dispatch(setTodolistsFetching(true))
     try {
       let response = await todoAPI.getTodolists()
+      console.log('EBSAL:', response)
       let settingsList: TodoType
 
+      let isSettingsListExist = false
+
       console.log(getState().settings.cloud.isLoaded)
-      response.map(async (list) => {
-        if(list.title === 'SETTINGS' && !getState().settings.cloud.isLoaded) await dispatch(initializeCloudSettings(list))
+      if(!getState().settings.cloud.isLoaded) {
+      response.map( (list) => {
+        if(list.title === 'SETTINGS'){ 
+            isSettingsListExist = true
+            dispatch(initializeCloudSettings(list))
+          }
+        
+          
+
       })
+      console.log('isSettingsListExist: ',isSettingsListExist)
+      if(!isSettingsListExist) {
+        const response = await todoAPI.todolistCreate('SETTINGS')
+        await dispatch(initializeCloudSettings(response.data.item))
+        await dispatch(createTodolist('Reminders', 'list', '#ff9f0a'))
+      }
+      }
 
-      batch(() => {
+      // if(isSettingsListExist)
+       batch(() => {
         dispatch(setTodolists(response))
-
+        response.map((list) => {
+          list.title !== 'SETTINGS' && dispatch(getTasks(list.id))
+        })
         dispatch(setTodolistsFetching(false))
       })
     } catch (e: any) {
@@ -130,11 +150,15 @@ export const deleteTask = (listId: string, taskId: string) => {
   }
 }
 
-export const createTask = (listId: string, title: string) => {
+export const createTask = (listId: string, title: string, description?: string) => {
   return async (dispatch: AppDispatch) => {
     try {
       const response = await todoAPI.createTask(title, listId)
-      return response.data
+      if(!description)return response.data
+      else {
+        const resp = await todoAPI.taskChange(listId, response.data.item.id, {...response.data.item, description: description})
+        return resp
+      }
     }
     catch (e: any) {
       console.log(e)
@@ -142,15 +166,19 @@ export const createTask = (listId: string, title: string) => {
   }
 }
 
-export const createTodolist = (title: string, iconName: string, accentColor: string) => {
+export const createTodolist = (title: string, iconName?: string, accentColor?: string) => {
   console.log(title, accentColor, iconName)
   return async (dispatch: AppDispatch) => {
     console.log(iconName, accentColor)
     await todoAPI.todolistCreate(title).then((data) => {
       //! fix types
+      if(iconName && accentColor) {
       dispatch(createListSetting(data.data.item.id, iconName, accentColor)).then(() => {
+        dispatch(getTodos())
+        
         
       })
+    }
     })
     
   }
@@ -162,6 +190,10 @@ export const deleteTodolist = (listId: string) => {
       dispatch(getTodos())
       //@ts-ignore
       let settingTask: SettingType = undefined
+
+      //!automatize and delete later 
+      if(listId === getState().settings.local.selectedList.id) dispatch(setSelectedListId({id: '', title: ''}))
+      //
 
       getState().settings.cloud.settings.map((s) => {
         console.log(s.title, listId)
@@ -177,7 +209,12 @@ export const deleteTodolist = (listId: string) => {
 }
 
 export const renameTodolist = (title: string, listId: string) => {
-  return async (dispatch: AppDispatch) => {
+  return async (dispatch: AppDispatch, getState: () => RootState) => {
+
+    //!automatize and delete later 
+    if(listId === getState().settings.local.selectedList.id) dispatch(setSelectedListId({id: listId, title}))
+    //
+    
     dispatch(renameList({title, todolistId: listId}))
     await todoAPI.todolistRename(title, listId)
   }

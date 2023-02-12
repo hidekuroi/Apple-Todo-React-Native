@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { CloudSettingsType } from "./../../types/main-types"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { AppDispatch, RootState } from "../../app/store"
@@ -16,6 +17,7 @@ interface SettingsStateType {
   local: {
     isSettingsListVisible: boolean,
     isSquareIcons: boolean
+    selectedList: {id: string, title: string}
   }
 }
 
@@ -27,8 +29,9 @@ const initialState: SettingsStateType = {
     isLoaded: false,
   },
   local: {
-    isSettingsListVisible: false,
-    isSquareIcons: false
+    isSettingsListVisible: Platform.OS === 'web' ? true : false,
+    isSquareIcons: false,
+    selectedList: {id: '', title: ''},
   },
 }
 
@@ -68,6 +71,7 @@ const settingsSlice = createSlice({
       state.cloud.isLoaded = false
 
       state.local.isSettingsListVisible = false
+      state.local.selectedList = {id: '', title: ''}
     },
     editSetting(
       state,
@@ -91,6 +95,9 @@ const settingsSlice = createSlice({
         default:
           break;
       }
+    },
+    setSelectedListId(state, action: PayloadAction<{id: string, title: string}>) {
+      state.local.selectedList = action.payload
     }
   },
 })
@@ -100,7 +107,8 @@ export const {
   setSettings,
   clearSettings,
   editSetting,
-  editLocalSetting
+  editLocalSetting,
+  setSelectedListId
 } = settingsSlice.actions
 
 //*THUNKS
@@ -145,7 +153,6 @@ export const createListSetting = (
         changeTask(settingsListId, settingTask.item.id, updatedSettingTask)
       )
       await dispatch(getSettings())
-      dispatch(getTodos())
     }
   }
 }

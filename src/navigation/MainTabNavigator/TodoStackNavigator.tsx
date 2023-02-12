@@ -3,15 +3,15 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { Platform } from "react-native"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
-import CreateNewListModal from "../../screens/TodoScreens/CreateNewListModal"
-import List from "../../screens/TodoScreens/List"
 import Todos from "../../screens/TodoScreens/Todos"
 import { TodoStackParamList } from "../../types/navigation-types"
+import { useLocale } from "../../hooks/useLocale"
 
 const TodoStackNavigator = () => {
   const TodoStack = createNativeStackNavigator<TodoStackParamList>()
 
   const { login } = useTypedSelector((state) => state.auth)
+  const i18n = useLocale()
   const { colors } = useMyTheme()
 
   return (
@@ -31,8 +31,7 @@ const TodoStackNavigator = () => {
         options={{
           title: login,
           headerSearchBarOptions: {
-            hideNavigationBar: true,
-            placeholder: "Search",
+            placeholder: i18n.t('searchPlaceholder'),
             hideWhenScrolling: true,
             obscureBackground: true,
           },

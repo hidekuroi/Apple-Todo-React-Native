@@ -11,12 +11,12 @@ import {
 import { useAppDispatch } from "../../hooks/useAppDispatch"
 import { signOut } from "../../features/auth/auth-slice"
 import { useMyTheme } from "../../hooks/useMyTheme"
-import CardItem from "../../components/CardItem"
 import Card from "../../components/Card"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
 import { SettingsStackParamList } from "../../types/navigation-types"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { clearSettings, setInitializedSettingsList } from "../../features/settings/settings-slice"
+import { clearSettings } from "../../features/settings/settings-slice"
+import { useLocale } from "../../hooks/useLocale"
 
 type SettingsScreenProps = NativeStackScreenProps<
   SettingsStackParamList,
@@ -27,6 +27,7 @@ const Settings: FC<SettingsScreenProps> = ({ navigation }) => {
   const { colors, dark } = useMyTheme()
   const { login } = useTypedSelector((state) => state.auth)
   const dispatch = useAppDispatch()
+  const i18n = useLocale()
 
   const signOutHandler = () => {
     dispatch(signOut())
@@ -37,8 +38,8 @@ const Settings: FC<SettingsScreenProps> = ({ navigation }) => {
     if (Platform.OS === "ios") {
       ActionSheetIOS.showActionSheetWithOptions(
         {
-          title: "Are you sure you want to log out?",
-          options: ["Cancel", "Log Out"],
+          title: i18n.t('logoutAlert'),
+          options: [i18n.t('cancel'), i18n.t('logout')],
           destructiveButtonIndex: 1,
           cancelButtonIndex: 0,
           userInterfaceStyle: dark ? "dark" : "light",
@@ -61,7 +62,7 @@ const Settings: FC<SettingsScreenProps> = ({ navigation }) => {
       <View style={{ justifyContent: "center", alignItems: "center" }}>
         <Card>
           <Card.Item
-            text="Profile"
+            text={i18n.t('profile')}
             helperText={login}
             onPress={() => navigation.navigate("Profile")}
             icon={{ iconName: "person", shape: "square", color: "#757de8" }}
@@ -88,7 +89,7 @@ const Settings: FC<SettingsScreenProps> = ({ navigation }) => {
             chevron
           />
           <Card.Item
-            text="Appearence"
+            text={i18n.t('appearence')}
             helperText={dark ? "Dark" : "Light"}
             onPress={() => navigation.navigate("Appearence")}
             icon={{
@@ -99,7 +100,7 @@ const Settings: FC<SettingsScreenProps> = ({ navigation }) => {
             chevron
           />
           <Card.Item
-            text="Todo settings"
+            text={i18n.t('todosettings')}
             onPress={() => navigation.navigate("TodoSettings")}
             isLast
             icon={{ iconName: "list", shape: "square", color: "#ff5000" }}
@@ -109,7 +110,7 @@ const Settings: FC<SettingsScreenProps> = ({ navigation }) => {
 
         <Card>
           <Card.Item
-            text="About"
+            text={i18n.t('about')}
             onPress={() => navigation.navigate("About")}
             icon={{
               iconName: "information-circle",
@@ -122,7 +123,7 @@ const Settings: FC<SettingsScreenProps> = ({ navigation }) => {
 
         <Card>
           <Button
-            title="Log Out"
+            title={i18n.t('logout')}
             color={colors.notification}
             onPress={btnHandler}
           />

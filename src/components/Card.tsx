@@ -5,11 +5,9 @@ import CardItem, { CardItemProps } from "./CardItem"
 
 const Card: FC<{
   children: Array<React.ReactNode> | React.ReactNode
-  backgroundColor?: string
-}> & { Item: FC<CardItemProps> } = ({
-  children,
-  backgroundColor,
-}): JSX.Element => {
+  isModalCard?: boolean
+  noMargin?: boolean
+}> & { Item: FC<CardItemProps> } = ({ children, isModalCard, noMargin }): JSX.Element => {
   const { colors } = useMyTheme()
 
   let childrenWithProps
@@ -21,11 +19,11 @@ const Card: FC<{
       c as JSX.Element,
       //! Damn, mb 'll optimize later
       childrenArray.length === 1
-        ? { isSingle: true }
+        ? { isSingle: true, isModalCard: isModalCard }
         : i === 0
-        ? { isFirst: true }
+        ? { isFirst: true, isModalCard: isModalCard }
         : i + 1 === childrenArray.length
-        ? { isLast: true }
+        ? { isLast: true, isModalCard: isModalCard }
         : {}
     )
   })
@@ -34,7 +32,9 @@ const Card: FC<{
     <View
       style={[
         styles.card,
-        { backgroundColor: backgroundColor ? backgroundColor : colors.card },
+        { backgroundColor: isModalCard ? colors.modalCard : colors.card },
+        isModalCard && { marginBottom: 16 },
+        noMargin && {marginBottom: 0}
       ]}
     >
       <View>{childrenWithProps ? childrenWithProps : children}</View>

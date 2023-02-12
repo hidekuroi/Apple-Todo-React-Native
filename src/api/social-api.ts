@@ -1,13 +1,12 @@
 import axios from "axios"
-import { UserPageType } from "../types/common"
+import { PhotosType, UserPageType } from "../types/common"
 // import APIKey from './apikey';
 
 export const instance = axios.create({
   baseURL: "https://social-network.samuraijs.com/api/1.0/",
   withCredentials: true,
-  // headers: {
-  //     'API-KEY': APIKey
-  // }
+  headers: {
+  }
 })
 // ENUMS FOR ERRORS REJECTION
 export enum ResultCodeEnum {
@@ -19,6 +18,14 @@ export enum ResultCodeForCaptcha {
   Error = 1,
   Captcha = 10,
 }
+
+
+type UploadPhotoResponse = {
+  data: {photos: PhotosType},
+  resultCode: ResultCodeEnum,
+  messages: Array<string>
+}
+
 
 // DEFUALT RESPONSE GENERIC
 export type DefaultResponseType<D = {}, RC = ResultCodeEnum> = {
@@ -33,4 +40,11 @@ export const profileAPI = {
       .get<UserPageType>(`profile/` + userId)
       .then((response) => response.data)
   },
+  uploadPhoto(file: any, apikey: string) {
+    let formData = new FormData();
+    formData.append('image', {uri: file.uri, name: 'photo.png',filename :'imageName.png',type: 'image/png'});
+    formData.append('Content-Type', 'image/png');
+
+    return instance.put<UploadPhotoResponse>('profile/photo', formData, {headers: {'API-KEY': apikey}}).then(response => response)
+  }
 }

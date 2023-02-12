@@ -11,12 +11,17 @@ import {
   TouchableOpacity,
   Platform,
   ActivityIndicator,
+  Button,
+  Text,
+  TouchableHighlight,
 } from "react-native"
 import { shallowEqual } from "react-redux"
+import Card from "../../components/Card"
 import TodolistItem from "../../components/TodolistItem"
 import { getSettings } from "../../features/settings/settings-slice"
 import { getTodos } from "../../features/todo/todo-slice"
 import { useAppDispatch } from "../../hooks/useAppDispatch"
+import { useLocale } from "../../hooks/useLocale"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
 import { TasksType, TodoType } from "../../types/common"
@@ -29,6 +34,7 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
   const dispatch = useAppDispatch()
 
   const { colors } = useMyTheme()
+  const i18n = useLocale()
   const bottomBarHeight = useBottomTabBarHeight()
 
   const todoData = useTypedSelector((state) => {
@@ -40,10 +46,19 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
     return state.todo.isTodolistsFetching
   })
 
-  const cloudSettings = useTypedSelector((state) => {return state.settings.cloud.settings})
-  const localSettings = useTypedSelector((state) => state.settings.local)
+  const cloudSettings = useTypedSelector((state) => {
+    return state.settings.cloud.settings
+  })
+  const isSettingsListVisible = useTypedSelector(
+    (state) => state.settings.local.isSettingsListVisible
+  )
+  const isSquareIcons = useTypedSelector(
+    (state) => state.settings.local.isSquareIcons
+  )
 
-  const isSettingsInitialized = useTypedSelector((state) => {return state.settings.cloud.isLoaded})
+  const isSettingsInitialized = useTypedSelector((state) => {
+    return state.settings.cloud.isLoaded
+  })
 
   console.log("TODOS RENDERED")
 
@@ -79,8 +94,19 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
     dispatch(getTodos())
   }
 
+  const newTaskHandler = () => {
+    navigation.navigate("TaskInfoNavigator")
+  }
+
   const listNavigate = (list: TodoType, color = colors.text, settings: any) => {
-    navigation.navigate("List", { list, color, settings: {iconNameValue: settings.iconNameValue, colorValue: settings.colorValue} })
+    navigation.navigate("List", {
+      list,
+      color,
+      settings: {
+        iconNameValue: settings.iconNameValue,
+        colorValue: settings.colorValue,
+      },
+    })
   }
 
   const onRefresh = useCallback(async () => {
@@ -104,37 +130,108 @@ const Todos: FC<TodosScreenProps> = React.memo(({ navigation }) => {
           { marginTop: 0, marginBottom: bottomBarHeight * 2 },
         ]}
       >
-        {/* <Button title='refresh' onPress={onRefresh} /> */}
-        {todoData?.length && isSettingsInitialized ? <View style={[styles.list, { backgroundColor: colors.card }]}>
-          <>
-          {console.log('REAL RENDER')}
-          {
-          todoData?.map((list: TodoType, index: number) => {
-            //@ts-ignore
-            let listSettings: any = []
-            cloudSettings.map((s: TasksType) => {
-              if(s.title === list.id) {
-                let temp = s.description.split(';')
-                temp.map((i) => {
-                  const splitted = i.split('=')
-                  listSettings[splitted[0]] = splitted[1]
-                })
-              }
-            })
-            return <View key={list.id} style={{display: list.title === 'SETTINGS' ? (localSettings.isSettingsListVisible ? 'flex' : 'none') : 'flex'}}>
-              <TodolistItem
-                text={list.title}
-                helperText={list.totalCount?.toString()}
-                handlePress={(color: string) => listNavigate(list, color, {iconNameValue: listSettings?.iconName, colorValue: listSettings?.accentColor})}
-                isLast={index + 1 !== todoData.length}
-                accentColor={listSettings?.accentColor}
-                iconName={listSettings?.iconName}
-                isSquare={localSettings.isSquareIcons}
-              />
-            </View>
-        })}</>
-        </View>  : <ActivityIndicator style={{flex: 1,justifyContent: 'center', alignItems: 'center'}} />}
+        {Platform.OS === "web" && (
+          <View style={{marginVertical: 12}}><Button title="refresh" onPress={onRefresh} /></View>
+        )}
+        {/* 
+        //! Automatize all this stuff to calculate automaticly in Card component
+        //? It's temporary button in any case :/
+        */}
+        <View style={{width: '100%', marginBottom: 12, flexDirection: 'row', justifyContent: 'flex-start'}}>
         
+        <View style={{width: '50%', justifyContent: 'center', marginLeft: Platform.OS === 'ios' ? '4.25%' : '0%'}}>
+          <Card noMargin>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "flex-start",
+              }}
+            >
+              <TouchableHighlight
+                onPress={newTaskHandler}
+                style={{flexDirection: "row", borderRadius: 11}}
+                underlayColor={colors.touching}
+              >
+                <View style={{
+                  flexDirection: "row",
+                  paddingHorizontal: 12,
+                  height: "100%",
+                  alignItems: "center",
+                  paddingVertical: 14,
+                  width: "100%",
+
+                }}>
+                <Ionicons name="add-circle" size={30} color={colors.primary} />
+                <Text
+                  style={{
+                    color: colors.primary,
+                    marginLeft: 10,
+                    fontSize: 17,
+                  }}
+                >
+                  {i18n.t('newTask')}
+                </Text>
+                </View>
+              </TouchableHighlight>
+            </View>
+          </Card>
+        </View>
+        </View>
+
+        {todoData?.length && isSettingsInitialized ? (
+          <View style={[styles.list, { backgroundColor: colors.card }]}>
+            <>
+              {console.log("REAL RENDER")}
+              {todoData?.map((list: TodoType, index: number) => {
+                //@ts-ignore
+                let listSettings: any = []
+                cloudSettings.map((s: TasksType) => {
+                  if (s.title === list.id) {
+                    let temp = s.description.split(";")
+                    temp.map((i) => {
+                      const splitted = i.split("=")
+                      listSettings[splitted[0]] = splitted[1]
+                    })
+                  }
+                })
+                return (
+                  <View
+                    key={list.id}
+                    style={{
+                      display:
+                        list.title === "SETTINGS"
+                          ? isSettingsListVisible
+                            ? "flex"
+                            : "none"
+                          : "flex",
+                    }}
+                  >
+                    <TodolistItem
+                      text={list.title}
+                      helperText={list.totalCount?.toString()}
+                      handlePress={(color: string) =>
+                        listNavigate(list, color, {
+                          iconNameValue: listSettings?.iconName,
+                          colorValue: listSettings?.accentColor,
+                        })
+                      }
+                      isLast={index + 1 !== todoData.length}
+                      accentColor={listSettings?.accentColor}
+                      iconName={listSettings?.iconName}
+                      isSquare={isSquareIcons}
+                      chevron
+                    />
+                  </View>
+                )
+              })}
+            </>
+          </View>
+        ) : (
+          <ActivityIndicator
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          />
+        )}
       </View>
       <StatusBar style="auto" />
     </ScrollView>

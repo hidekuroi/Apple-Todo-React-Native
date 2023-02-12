@@ -10,6 +10,9 @@ type TodolistProps = {
   iconName?: string
   accentColor?: string
   isSquare?: boolean
+  chevron?: boolean
+  isSelected?: boolean
+  isModal?: boolean
 
   handlePress: (color: string) => void
 }
@@ -21,80 +24,63 @@ const TodolistItem: FC<TodolistProps> = ({
   helperText,
   iconName,
   accentColor,
-  isSquare
+  isSquare,
+  chevron,
+  isSelected,
+  isModal
 }) => {
   const { colors } = useMyTheme()
-
-  const randomColor = () => {
-    let value: string
-    const num = Math.round(Math.random() * 10)
-    switch (num) {
-      case 1:
-      case 2:
-      case 3:
-        value = "tomato"
-        break
-      case 4:
-      case 5:
-      case 6:
-        value = "#356ce2"
-        break
-      case 7:
-      case 8:
-      case 9:
-        value = "#ff69cc"
-        break
-      case 10:
-      case 0:
-        value = "#2fdeb1"
-        break
-      default:
-        value = "red"
-    }
-    return value
-  }
-
-  let iconColor: string = useMemo(() => randomColor(), [])
 
   return (
     <TouchableHighlight
       activeOpacity={1}
       underlayColor={colors.touching}
-      onPress={() => handlePress(accentColor ? accentColor : iconColor)}
+      onPress={() => handlePress(accentColor ? accentColor : "#0a84fe")}
     >
       <View style={styles.item}>
         {/* //?Border radius 8 for square and 50 for ellipse */}
-        <View style={[styles.iconPartWrapper]}>
-          {text !== 'SETTINGS' && <View
-            style={[
-              styles.iconBackground,
-              { backgroundColor: accentColor ? accentColor : iconColor, borderRadius: isSquare ? 8 : 50 },
-            ]}
-          >
+        <View style={[styles.iconPartWrapper, isModal && {marginLeft: "4.25%"}]}>
+          {text !== "SETTINGS" && (
             <View
-              style={{
-                position: "absolute",
-                left: 1.7,
-                right: 0,
-                top: 0,
-                bottom: 0,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
+              style={[
+                styles.iconBackground,
+                {
+                  backgroundColor: accentColor ? accentColor : "#0a84fe",
+                  borderRadius: isSquare ? 8 : 50,
+                },
+              ]}
             >
-              {/* @ts-ignore */}
-              <Ionicons size={20} color={"white"} name={iconName ? iconName : "list"} />
+              <View
+                style={{
+                  position: "absolute",
+                  left: 1.7,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Ionicons
+                  size={20}
+                  color={"white"}
+                  //@ts-ignore
+                  name={iconName ? iconName : "list"}
+                />
+              </View>
             </View>
-          </View>}
+          )}
         </View>
 
         <View
           style={[
             styles.mainPartWrapper,
             isLast && {
-              borderBottomWidth: 1,
+              borderBottomWidth: 0.7,
               borderBottomColor: colors.divider,
+              flexShrink: 1,
             },
+            isModal && {marginLeft: "4.25%"}
           ]}
         >
           <View style={styles.mainPart}>
@@ -104,6 +90,8 @@ const TodolistItem: FC<TodolistProps> = ({
                 {
                   color: colors.text,
                   fontWeight: text.startsWith("*") ? "bold" : "normal",
+                  flexShrink: 1,
+                  marginRight: 12,
                 },
               ]}
             >
@@ -115,11 +103,13 @@ const TodolistItem: FC<TodolistProps> = ({
                   {helperText}
                 </Text>
               )}
-              <Ionicons
-                name="chevron-forward"
-                size={20}
-                color={colors.helperIcon}
-              />
+              {chevron ? (
+                <Ionicons
+                  name="chevron-forward"
+                  size={20}
+                  color={colors.helperIcon}
+                />
+              ) : isSelected && <Ionicons name="checkmark" size={24} color={colors.primary} />}
             </View>
           </View>
         </View>
@@ -135,6 +125,8 @@ const styles = StyleSheet.create({
   },
   taskTitleText: {
     fontSize: 17,
+    paddingVertical: 16,
+
   },
   mainPartWrapper: {
     flexGrow: 1,
@@ -144,7 +136,6 @@ const styles = StyleSheet.create({
   mainPart: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 16,
   },
   iconPartWrapper: {
     marginLeft: 12,

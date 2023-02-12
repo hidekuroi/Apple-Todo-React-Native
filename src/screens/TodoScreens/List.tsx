@@ -1,13 +1,11 @@
 import { useHeaderHeight } from "@react-navigation/elements"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { BlurView } from "expo-blur"
 import { StatusBar } from "expo-status-bar"
 import React, { FC, useCallback, useEffect, useRef, useState } from "react"
 import {
   View,
   StyleSheet,
   Text,
-  ScrollView,
   RefreshControl,
   ActivityIndicator,
   Platform,
@@ -17,8 +15,10 @@ import {
   Animated,
   LayoutRectangle,
   Dimensions,
+  KeyboardAvoidingView,
+  Keyboard,
+  Pressable,
 } from "react-native"
-import { todoAPI } from "../../api/todo-api"
 import BottomToolbar from "../../components/BottomToolbar"
 import Task from "../../components/Task"
 import {
@@ -28,8 +28,10 @@ import {
   setError,
 } from "../../features/todo/todo-slice"
 import { useAppDispatch } from "../../hooks/useAppDispatch"
+import { useLocale } from "../../hooks/useLocale"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
+import { TasksType } from "../../types/common"
 import { RootStackParamList } from "../../types/navigation-types"
 import { deepComparison } from "../../utils/deepComparison"
 
@@ -46,7 +48,7 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
   const test = useTypedSelector((state) =>
     state.settings.cloud.settings.find((setting) => setting.title === list.id)
   )
-  
+
   let settings2: any = {}
   let temp = test?.description.split(";")
   temp?.map((i) => {
@@ -59,6 +61,7 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
   const id = list.id
 
   const { colors, dark } = useMyTheme()
+  const i18n = useLocale()
   // const tabBarHeight = useBottomTabBarHeight()
   const barHeight = useHeaderHeight()
   const [refreshing, setRefreshing] = useState<boolean>(false)
@@ -70,6 +73,8 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
   const topEdge = listEnd && listEnd.y - height + listEnd.height
 
   const [initialized, setInitialized] = useState<boolean>(true)
+
+  const headerHeight = useHeaderHeight()
 
   const [newTaskAmount, setNewTaskAmount] = useState<Array<number>>([])
 
@@ -105,17 +110,21 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
   }, [])
 
   useEffect(() => {
-    navigation.setOptions ({
+    navigation.setOptions({
       title: tasksD?.title,
       headerLargeTitleStyle: {
         color: settings2.accentColor,
       },
       headerTintColor: settings2.accentColor,
       headerRight: () => (
-        <Button title="Edit" color={settings2.accentColor} onPress={menuHandler} />
+        <Button
+          title={i18n.t('edit')}
+          color={settings2.accentColor}
+          onPress={menuHandler}
+        />
       ),
     })
-    console.log('changed')
+    console.log("changed")
   }, [settings2.accentColor, tasksD?.title])
 
   const deleteList = () => {
@@ -137,8 +146,8 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
     if (Platform.OS === "ios") {
       ActionSheetIOS.showActionSheetWithOptions(
         {
-          title: `Edit "${tasksD?.title}"`,
-          options: ["Cancel", "Edit", "Delete list"],
+          title: `${i18n.t('editFull')} "${tasksD?.title}"`,
+          options: [i18n.t('cancel'), i18n.t('editFull'), i18n.t('deleteList')],
           destructiveButtonIndex: 2,
           cancelButtonIndex: 0,
           userInterfaceStyle: dark ? "dark" : "light",
@@ -147,28 +156,35 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
           if (buttonIndex === 0) {
             console.log("cancel")
           } else if (buttonIndex === 2) {
+            if(list.title !== 'SETTINGS') {
             Alert.alert(
-              `Delete "${list.title}"`,
-              "Are you sure you want to delete this list?",
+              `${i18n.t('delete')} "${tasksD?.title}"`,
+              i18n.t('deleteAlert'),
               [
-                { text: "Cancel", style: "cancel" },
-                { text: "Delete", style: "destructive", onPress: deleteList },
+                { text: i18n.t('cancel'), style: "cancel" },
+                { text: i18n.t('delete'), style: "destructive", onPress: deleteList },
               ],
               { userInterfaceStyle: dark ? "dark" : "light" }
             )
+            } else {
+              Alert.alert(i18n.t('cannotDelete'))
+            }
           } else {
+            if(list.title !== 'SETTINGS') {
             navigation.navigate("CreateNewListModal", {
               colorValue: settings2.accentColor,
               iconNameValue: settings2.iconName,
               title: tasksD?.title,
               todolistId: list.id,
             })
+          } else  Alert.alert(i18n.t('cannotEdit'))
           }
         }
       )
     } else if (Platform.OS === "android") {
+      if(list.title !== 'SETTINGS') {
       Alert.alert(
-        `Delete "${list.title}"`,
+        `${i18n.t('delete')} "${list.title}"`,
         "Are you sure you want to delete this list?",
         [
           { text: "Cancel", style: "cancel" },
@@ -176,6 +192,8 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
         ],
         { userInterfaceStyle: dark ? "dark" : "light" }
       )
+      }
+      else Alert.alert(i18n.t('cannotDelete'))
     }
 
     //! delete later
@@ -200,10 +218,19 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
     })
   }, [])
 
+  console.log(listEnd)
+
   return (
-    <View style={{ height: "100%" }}>
+    <KeyboardAvoidingView style={{ 
+      display: "flex",
+      height: Dimensions.get("window").height,
+      width: Dimensions.get("window").width,
+     }}
+     behavior={Platform.OS === "ios" ? "padding" : "height"}
+     >
       <Animated.ScrollView
         contentInsetAdjustmentBehavior="automatic"
+        keyboardShouldPersistTaps={'always'}
         onScroll={Animated.event(
           [
             {
@@ -217,20 +244,19 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
           { useNativeDriver: true }
         )}
         scrollEventThrottle={16}
-        style={{ height: "100%" }}
+        style={{ height: "100%", backgroundColor: dark ? colors.background : colors.card }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
         <View style={{ justifyContent: "center", alignItems: "center" }}>
-          {(tasksD?.tasks && initialized && tasksD.tasks.length > 0) ||
+          {(tasksD?.tasks && initialized && tasksD?.tasks?.length > 0) ||
           (newTaskAmount.length > 0 && initialized) ? (
             <View style={{ width: "100%" }}>
               <View
                 style={{
                   justifyContent: "center",
                   alignItems: "center",
-                  backgroundColor: colors.background,
                   width: "100%",
                 }}
               >
@@ -261,9 +287,10 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
                       key={t.id}
                       index={index + 1}
                       listId={tasksD.id}
+                      taskInfoHandler={(task: TasksType) => {navigation.navigate('TaskInfoNavigator', {task}); Keyboard.dismiss()}}
                     />
                   ))}
-
+                
                 {/* //?Layout block to start interpolation */}
                 <View
                   onLayout={(e) => {
@@ -276,6 +303,7 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
                   }}
                 />
               </View>
+              
               {/* //?/ */}
             </View>
           ) : (
@@ -286,11 +314,14 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
                 </View>
               ) : (
                 !newTaskAmount.length && (
-                  <View>
+                  //! change this method of adding new task
+                  <Pressable onPress={() => addNewTask()} style={{height: Dimensions.get("window").height - headerHeight, width: '100%', alignItems: 'center'}}>
+                    <View>
                     <Text style={{ color: colors.disabledText }}>
-                      タスクがありません
+                      {i18n.t('noTasks')}
                     </Text>
-                  </View>
+                    </View>
+                  </Pressable>
                 )
               )}
             </>
@@ -303,11 +334,11 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
         scrollingY={scrollingY}
         topEdge={topEdge}
         accentColor={settings2.accentColor}
-        tasksLength={tasksD?.tasks?.length}
+        tasksLength={tasksD?.tasks?.length ? tasksD?.tasks.length + newTaskAmount.length : newTaskAmount.length}
       />
 
       <StatusBar style="auto" />
-    </View>
+    </KeyboardAvoidingView>
   )
 })
 

@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons"
-import React, { FC } from "react"
+import React, { FC, useState } from "react"
 import {
   View,
   StyleSheet,
@@ -19,6 +19,7 @@ type IconType = {
 export type CardItemProps = {
   text: string
   helperText?: string
+  indicatorColor?: string
   isFirst?: boolean
   isSingle?: boolean
   isLast?: boolean
@@ -27,12 +28,13 @@ export type CardItemProps = {
   loading?: boolean
   switchValue?: boolean
   disabled?: boolean
+  isModalCard?: boolean
 
   onPress?: () => void
   onSwitch?: () => void
 }
 
-const CardItem: FC<CardItemProps> = ({
+const CardItem: FC<CardItemProps> = React.memo(({
   text,
   helperText,
   isFirst,
@@ -45,6 +47,8 @@ const CardItem: FC<CardItemProps> = ({
   disabled,
   onPress,
   onSwitch,
+  isModalCard,
+  indicatorColor
 }) => {
   const { colors } = useMyTheme()
 
@@ -56,7 +60,7 @@ const CardItem: FC<CardItemProps> = ({
         isLast && { borderBottomLeftRadius: 11, borderBottomRightRadius: 11 },
       ]}
       activeOpacity={1}
-      underlayColor={colors.touching}
+      underlayColor={isModalCard ? colors.modalTouching : colors.touching}
       onPress={onPress && !disabled ? () => onPress() : undefined}
     >
       <View style={styles.item}>
@@ -98,7 +102,7 @@ const CardItem: FC<CardItemProps> = ({
             styles.mainPartWrapper,
             !isLast &&
               !isSingle && {
-                borderBottomWidth: 1,
+                borderBottomWidth: 0.5,
                 borderBottomColor: colors.divider,
               },
           ]}
@@ -111,6 +115,7 @@ const CardItem: FC<CardItemProps> = ({
                   color: disabled ? colors.disabledText : colors.text,
                   marginLeft: icon ? 0 : 4,
                 },
+                isModalCard && {paddingVertical: 14}
               ]}
             >
               {icon
@@ -119,13 +124,18 @@ const CardItem: FC<CardItemProps> = ({
             </Text>
             <View style={styles.helperPart}>
               {helperText && (
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                {indicatorColor && <View style={{backgroundColor: indicatorColor, borderRadius: 50, height: 8, width: 8, marginRight: 5}} />}
                 <Text style={[{ color: colors.helperText }, styles.helperText]}>
                   {icon && text.length > 15
                     ? `${helperText.substring(0, 11)}${
                         helperText.length > 11 ? "..." : ""
                       }`
-                    : helperText}
+                    : `${helperText.substring(0, 22)}${
+                      helperText.length > 22 ? "..." : ""
+                    }`}
                 </Text>
+                </View>
               )}
               {chevron && (
                 <View>
@@ -154,7 +164,7 @@ const CardItem: FC<CardItemProps> = ({
       </View>
     </TouchableHighlight>
   )
-}
+})
 
 export default CardItem
 
@@ -165,6 +175,7 @@ const styles = StyleSheet.create({
   },
   taskTitleText: {
     fontSize: 17,
+    paddingVertical: 11,
   },
   mainPartWrapper: {
     flexGrow: 1,
@@ -174,7 +185,7 @@ const styles = StyleSheet.create({
   mainPart: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 11,
+    alignItems: 'center',
   },
   iconPartWrapper: {
     marginLeft: 16,

@@ -1,24 +1,21 @@
-import { Ionicons } from "@expo/vector-icons"
 import React, { FC, useState } from "react"
-import { View, StyleSheet, Text, Pressable } from "react-native"
-import { editSetting } from "../../features/settings/settings-slice"
-import { useAppDispatch } from "../../hooks/useAppDispatch"
+import { View, StyleSheet, Pressable } from "react-native"
 import { useMyTheme } from "../../hooks/useMyTheme"
 
 type ColorpickerProps = {
   initialColor: string
   setColor: (color: string) => void
 }
-const Colorpicker: FC<ColorpickerProps> = ({ setColor, initialColor }) => {
+const Colorpicker: FC<ColorpickerProps> = React.memo(({ setColor, initialColor }) => {
   const { colors } = useMyTheme()
-  const dispatch = useAppDispatch()
   const [pickedColor, setPickedColor] = useState<string>(initialColor)
 
   const colorsArr = [
     ["#ff453a", "#ff9f0a", "#ffd50a", "#30d15b", "#78c3fe", "#0a84fe"],
     ["#5e5ce6", "#fe4f79", "#d57ff5", "#c9a675", "#727e87", "#ebb5ae"],
-    ["#ff69cc", "#2fdeb1", "tomato", "cyan", "magenta", "#ad5858"]
+    ["#ff69cc", "#2fdeb1", "tomato", "cyan", "magenta", "#ad5858"],
   ]
+  console.log('rendered')
 
   const pickColor = (color: string) => {
     setPickedColor(color)
@@ -28,8 +25,14 @@ const Colorpicker: FC<ColorpickerProps> = ({ setColor, initialColor }) => {
   return (
     <View style={{ justifyContent: "center", alignItems: "center" }}>
       <View style={{ width: "91.5%" }}>
-          {colorsArr.map((row: Array<string>, index) => (
-            <View key={index} style={[styles.row, { marginBottom: index+1 === colorsArr.length ? 0 : 5 }]}>
+        {colorsArr.map((row: Array<string>, index) => (
+          <View
+            key={index}
+            style={[
+              styles.row,
+              { marginBottom: index + 1 === colorsArr.length ? 0 : 5 },
+            ]}
+          >
             {row.map((color: string) => {
               return (
                 <View
@@ -70,12 +73,12 @@ const Colorpicker: FC<ColorpickerProps> = ({ setColor, initialColor }) => {
                 </View>
               )
             })}
-            </View>
-          ))}
+          </View>
+        ))}
       </View>
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   list: {

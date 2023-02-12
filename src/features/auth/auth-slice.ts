@@ -1,7 +1,13 @@
-import { FormType, FullIsAuthResponseType } from "./../../types/common"
+import {
+  FormType,
+  FullIsAuthResponseType,
+  TasksType,
+} from "./../../types/common"
 import { authAPI } from "./../../api/auth-api"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { AppDispatch, RootState } from "../../app/store"
+import { profileAPI } from "../../api/social-api"
+import { Alert } from "react-native"
 // import { createAsyncThunk } from '@reduxjs/toolkit';
 
 interface AuthStateType {
@@ -95,6 +101,33 @@ export const signIn = (form: FormType) => {
 export const signOut = () => {
   return async (dispatch: AppDispatch) => {
     await authAPI.logout().then(() => dispatch(authCheck()))
+  }
+}
+
+export const uploadImage = (image: string) => {
+  return async (dispatch: AppDispatch, getState: () => RootState) => {
+    const setting = getState().settings.cloud.settings.find(
+      (setting: TasksType) => setting.title === "apikey"
+    )
+    console.log(setting)
+    if (setting && setting.description?.length) {
+      try {
+      await profileAPI
+        .uploadPhoto(image, setting.description)
+        .then((response: any) => {
+          console.log(response.data.resultCode)
+          if(response.data.resultCode === 1) Alert.alert( `Error`,
+          `${response.data.messages}`,
+          [
+            { text: "Ok", style: "cancel" },
+          ],
+          { userInterfaceStyle: "dark" })
+        })
+      }
+      catch(e) {
+        alert('error')
+      }
+    } else alert("No apikey provided")
   }
 }
 
