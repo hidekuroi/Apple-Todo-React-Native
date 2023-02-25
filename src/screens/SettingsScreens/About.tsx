@@ -11,7 +11,7 @@ const About: FC = () => {
   const headerHeight = useHeaderHeight()
   const i18n = useLocale()
 
-  const [version, setVersion] = useState(["0.2.0", "etude"])
+  const [version, setVersion] = useState(["0.2.1", "etude"])
 
   return (
     <ScrollView

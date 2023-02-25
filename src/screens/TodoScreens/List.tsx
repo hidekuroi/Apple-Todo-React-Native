@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons"
 import { useHeaderHeight } from "@react-navigation/elements"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { StatusBar } from "expo-status-bar"
@@ -18,10 +19,16 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   Pressable,
+  InputAccessoryView,
+  TouchableHighlight,
+  TouchableOpacity,
 } from "react-native"
 import BottomToolbar from "../../components/BottomToolbar"
 import Task from "../../components/Task"
 import {
+  changeTask,
+  createTask,
+  deleteTask,
   deleteTodolist,
   getTasks,
   getTodos,
@@ -31,7 +38,7 @@ import { useAppDispatch } from "../../hooks/useAppDispatch"
 import { useLocale } from "../../hooks/useLocale"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { useTypedSelector } from "../../hooks/useTypedSelector"
-import { TasksType } from "../../types/common"
+import { TasksType, UpdateTaskModel } from "../../types/common"
 import { RootStackParamList } from "../../types/navigation-types"
 import { deepComparison } from "../../utils/deepComparison"
 
@@ -133,6 +140,18 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
     })
   }
 
+  const handleChangeTask = useCallback((updatedTask: UpdateTaskModel, todolistId: string, id: string) => {
+    dispatch(changeTask(todolistId, id, updatedTask))
+  }, [])
+
+  const handleDeleteTask = useCallback((todolistId: string, id: string) => {
+    dispatch(deleteTask(todolistId, id))
+  }, [])
+
+  const handleCreateTask = useCallback((todolistId: string, title: string) => {
+    dispatch(createTask(todolistId, title))
+  }, [])
+
   const addNewTask = () => {
     if (newTaskAmount.length) {
       console.log(newTaskAmount)
@@ -215,6 +234,7 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
     setRefreshing(true)
     dispatch(getTasks(id)).then(() => {
       setRefreshing(false)
+      setNewTaskAmount([])
     })
   }, [])
 
@@ -274,6 +294,7 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
                           listId={tasksD.id}
                           colors={colors}
                           index={nt}
+                          handleCreate={handleCreateTask}
                           btnColor={settings2.accentColor}
                         />
                       )
@@ -282,8 +303,11 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
                   tasksD.tasks.map((t, index) => (
                     <Task
                       task={t}
+                      inputAccessoryID={'inputaccessory'}
                       btnColor={settings2.accentColor}
                       colors={colors}
+                      handleChange={handleChangeTask}
+                      handleDelete={handleDeleteTask}
                       key={t.id}
                       index={index + 1}
                       listId={tasksD.id}
@@ -338,6 +362,14 @@ const List: FC<ListProps> = React.memo(({ navigation, route }) => {
       />
 
       <StatusBar style="auto" />
+      <InputAccessoryView nativeID="inputaccessory" style={{flexDirection: 'row'}}>
+                  <TouchableOpacity style={{padding: 7, flex: 0.5, alignItems: 'center'}}>
+                    <Ionicons name="flag-outline" color={colors.helperText} size={26}/>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{padding: 7, flex: 0.5, alignItems: 'center'}}>
+                    <Ionicons name="trash-outline" color={colors.helperText} size={26}/>
+                  </TouchableOpacity>
+      </InputAccessoryView>
     </KeyboardAvoidingView>
   )
 })

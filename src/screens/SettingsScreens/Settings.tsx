@@ -90,7 +90,7 @@ const Settings: FC<SettingsScreenProps> = ({ navigation }) => {
           />
           <Card.Item
             text={i18n.t('appearence')}
-            helperText={dark ? "Dark" : "Light"}
+            helperText={dark ? i18n.t('appearenceDark') : i18n.t('appearenceLight')}
             onPress={() => navigation.navigate("Appearence")}
             icon={{
               iconName: "color-palette",

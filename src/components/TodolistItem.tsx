@@ -17,7 +17,7 @@ type TodolistProps = {
   handlePress: (color: string) => void
 }
 
-const TodolistItem: FC<TodolistProps> = ({
+const TodolistItem: FC<TodolistProps> = React.memo(({
   text,
   handlePress,
   isLast = false,
@@ -116,7 +116,7 @@ const TodolistItem: FC<TodolistProps> = ({
       </View>
     </TouchableHighlight>
   )
-}
+})
 
 const styles = StyleSheet.create({
   item: {

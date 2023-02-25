@@ -43,7 +43,7 @@ const TaskInfoNavigator = ({ navigation, route }) => {
         initialParams={{task: routeProps?.task}}
       />
       <TaskInfoStack.Screen name="TaskDetails" options={{headerBackTitle: i18n.locale === 'ru' ? i18n.t('back') : i18n.t('titleNewtask')}} component={TaskDetails} />
-      <TaskInfoStack.Screen name="SelectList" options={{headerLargeStyle : {backgroundColor: dark ? colors.modalBackground : colors.modalCard}}} component={SelectList} />
+      <TaskInfoStack.Screen name="SelectList" options={{headerLargeStyle : {backgroundColor: dark ? colors.modalBackground : colors.modalCard}, headerBackTitle: i18n.t('back')}} component={SelectList} />
     </TaskInfoStack.Navigator>
   )
 }

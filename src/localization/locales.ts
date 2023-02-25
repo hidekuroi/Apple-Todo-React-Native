@@ -175,7 +175,7 @@ export const ja: LocaleType = {
         auth: 'ログイン',
     
     //auth screen
-        authEmail: 'Email',
+        authEmail: 'メール',
         authPassword: 'パスワード',
         authLogin: 'ログイン',
         authNoaccount: 'アカウントを持っていませんか?',
@@ -189,7 +189,7 @@ export const ja: LocaleType = {
         listName: 'リスト名',
     
     //new task screen
-        titleNewtask: '新規リマインダ',
+        titleNewtask: '新規リマインダー',
         title: 'タイトル',
         description: 'メモ',
         details: '詳細',
@@ -205,7 +205,7 @@ export const ja: LocaleType = {
     
     //profile screen
         profileName: '名前',
-        profileEmail: 'Email',
+        profileEmail: 'メール',
     
     //appearence screen
         appearenceTheme: '外観モード',

@@ -17,6 +17,7 @@ import { useAppDispatch } from "../hooks/useAppDispatch"
 import { changeTask, createTask, getTasks } from "../features/todo/todo-slice"
 import { StatusBar } from "expo-status-bar"
 import { useLocale } from "../hooks/useLocale"
+import TaskDetailsComponent from "../components/TaskDetailsComponent"
 
 type TaskInfoModalProps = NativeStackScreenProps<TaskInfoParamList, "TaskInfo">
 
@@ -34,8 +35,13 @@ const TaskInfoModal: FC<TaskInfoModalProps> = ({ navigation, route }) => {
   const [title, setTitle] = useState<string>(
     routeProps.task ? routeProps.task.title : ""
   )
+  const [isFlagged, setIsFlagged] = useState<number>(
+    routeProps.task ? routeProps.task.priority : 1
+  )
   const [listSettings, setListSettings] = useState<any>()
-  const [description, setDescription] = useState<string>(routeProps.task ? routeProps.task.description : '')
+  const [description, setDescription] = useState<string>(
+    routeProps.task ? routeProps.task.description : ""
+  )
 
   // const [selectedList, setSelectedList] = useState<TodoType | undefined>(
   //   routeProps?.listId
@@ -48,62 +54,63 @@ const TaskInfoModal: FC<TaskInfoModalProps> = ({ navigation, route }) => {
   // )
 
   //? optimize and change setting get method
-  let tempSettings:any = [] 
-
+  let tempSettings: any = []
 
   useEffect(() => {
-  if (!routeProps?.task) {
-    cloudSettings.map((s: TasksType) => {
-      if (
-        localSettings.selectedList.id &&
-        s.title === localSettings.selectedList.id
-      ) {
-        let temp = s.description.split(";")
-        temp.map((i) => {
-          const splitted = i.split("=")
-          tempSettings[splitted[0]] = splitted[1]
-        })
-        setListSettings(tempSettings)
-      } else if (!localSettings.selectedList.id && s.title === todoData[0].id) {
-        let temp = s.description.split(";")
-        temp.map((i) => {
-          const splitted = i.split("=")
-          tempSettings[splitted[0]] = splitted[1]
-        })
-        setListSettings(tempSettings)
-      }
-    })
-  } else {
-    console.log("getin")
-    cloudSettings.map((s: TasksType) => {
-      if (s.title === routeProps.task?.todoListId) {
-        let temp = s.description.split(";")
-        temp.map((i) => {
-          const splitted = i.split("=")
-          tempSettings[splitted[0]] = splitted[1]
-        })
-        setListSettings(tempSettings)
-      }
-    })
-  }
+    if (!routeProps?.task) {
+      cloudSettings.map((s: TasksType) => {
+        if (
+          localSettings.selectedList.id &&
+          s.title === localSettings.selectedList.id
+        ) {
+          let temp = s.description.split(";")
+          temp.map((i) => {
+            const splitted = i.split("=")
+            tempSettings[splitted[0]] = splitted[1]
+          })
+          setListSettings(tempSettings)
+        } else if (
+          !localSettings.selectedList.id &&
+          s.title === todoData[0].id
+        ) {
+          let temp = s.description.split(";")
+          temp.map((i) => {
+            const splitted = i.split("=")
+            tempSettings[splitted[0]] = splitted[1]
+          })
+          setListSettings(tempSettings)
+        }
+      })
+    } else {
+      console.log("getin")
+      cloudSettings.map((s: TasksType) => {
+        if (s.title === routeProps.task?.todoListId) {
+          let temp = s.description.split(";")
+          temp.map((i) => {
+            const splitted = i.split("=")
+            tempSettings[splitted[0]] = splitted[1]
+          })
+          setListSettings(tempSettings)
+        }
+      })
+    }
   }, [cloudSettings, cloudSettings])
-  
 
   useEffect(() => {
     //? does not work properly with native stack navigation
     // navigation.addListener('beforeRemove', (e) => {e.preventDefault()})
     navigation.setOptions({
-      title: routeProps.task ? i18n.t('details') : i18n.t('titleNewtask'),
+      title: routeProps.task ? i18n.t("details") : i18n.t("titleNewtask"),
       headerLeft: () => (
         <Button
-          title={i18n.t('cancel')}
+          title={i18n.t("cancel")}
           color={colors.primary}
           onPress={() => navigation.goBack()}
         />
       ),
       headerRight: () => (
         <Button
-          title={routeProps.task ? i18n.t('done') : i18n.t('add')}
+          title={routeProps.task ? i18n.t("done") : i18n.t("add")}
           disabled={title.length ? false : true}
           onPress={doneHandler}
           color={colors.primary}
@@ -113,27 +120,36 @@ const TaskInfoModal: FC<TaskInfoModalProps> = ({ navigation, route }) => {
     // if (routeProps?.title) {
     //   navigation.setOptions({ title: "Edit" })
     // }
-  }, [title, description])
+  }, [title, description, isFlagged, localSettings.selectedList])
+
+  const onFlag = (isFlagged: boolean) => {
+    setIsFlagged(isFlagged ? 2 : 1)
+    console.log('flaggin', isFlagged)
+  }  
 
   const doneHandler = async () => {
     if (routeProps.task) {
-      (title !== routeProps.task.title) || (description !== routeProps.task.description) &&
-      console.log('popal')
-        await dispatch(
-          changeTask(routeProps.task.todoListId, routeProps.task.id, {
-            ...routeProps.task,
-            title: title,
-            description: description
-          })
-        )
-        dispatch(getTasks(routeProps.task.todoListId))
+      title !== routeProps.task.title ||
+        description !== routeProps.task.description ||
+        isFlagged !== routeProps.task.priority 
+      await dispatch(
+        changeTask(routeProps.task.todoListId, routeProps.task.id, {
+          ...routeProps.task,
+          title: title,
+          description: description,
+          priority: isFlagged,
+        })
+      )
+      dispatch(getTasks(routeProps.task.todoListId))
     } else {
       dispatch(
         createTask(
           localSettings.selectedList.id
             ? localSettings.selectedList.id
             : todoData[0].id,
-          title, description
+          title,
+          description,
+          isFlagged !== 1 ? isFlagged : undefined
         )
       )
     }
@@ -141,11 +157,15 @@ const TaskInfoModal: FC<TaskInfoModalProps> = ({ navigation, route }) => {
   }
 
   const navigateDetails = useCallback(() => {
-    navigation.navigate("TaskDetails")
-  }, [])
+    navigation.navigate("TaskDetails", {isFlagged: isFlagged === 1 ? false : true, onFlag})
+  }, [isFlagged])
 
   const navigateSelectList = useCallback(() => {
-    navigation.navigate("SelectList", { todoData, cloudSettings, isEditTask: routeProps.task ? true : false })
+    navigation.navigate("SelectList", {
+      todoData,
+      cloudSettings,
+      isEditTask: routeProps.task ? true : false,
+    })
   }, [])
 
   return (
@@ -161,7 +181,7 @@ const TaskInfoModal: FC<TaskInfoModalProps> = ({ navigation, route }) => {
             <View>
               <TextInput
                 multiline
-                placeholder={i18n.t('title')}
+                placeholder={i18n.t("title")}
                 maxLength={100}
                 placeholderTextColor={colors.modalInputPlaceholder}
                 style={{
@@ -181,7 +201,7 @@ const TaskInfoModal: FC<TaskInfoModalProps> = ({ navigation, route }) => {
             </View>
             <View>
               <TextInput
-                placeholder={i18n.t('description')}
+                placeholder={i18n.t("description")}
                 placeholderTextColor={colors.modalInputPlaceholder}
                 multiline
                 value={description}
@@ -199,16 +219,25 @@ const TaskInfoModal: FC<TaskInfoModalProps> = ({ navigation, route }) => {
             </View>
           </View>
         </Card>
+        {routeProps.task ? (
+          <View style={{ width: "100%" }}>
+            <TaskDetailsComponent
+              onFlag={(isFlagged: boolean) => onFlag(isFlagged)}
+              isFlagged={routeProps.task.priority === 1 ? false : true}
+            />
+          </View>
+        ) : (
+          <Card isModalCard>
+            <Card.Item
+              text={i18n.t("details")}
+              chevron
+              onPress={navigateDetails}
+            />
+          </Card>
+        )}
         <Card isModalCard>
           <Card.Item
-            text={i18n.t('details')}
-            chevron
-            onPress={navigateDetails}
-          />
-        </Card>
-        <Card isModalCard>
-          <Card.Item
-            text={i18n.t('list')}
+            text={i18n.t("list")}
             chevron
             indicatorColor={listSettings?.accentColor}
             helperText={

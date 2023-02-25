@@ -30,11 +30,12 @@ const TodoStackNavigator = () => {
         component={Todos}
         options={{
           title: login,
-          headerSearchBarOptions: {
-            placeholder: i18n.t('searchPlaceholder'),
-            hideWhenScrolling: true,
-            obscureBackground: true,
-          },
+          // headerSearchBarOptions: {
+          //   placeholder: i18n.t('searchPlaceholder'),
+          //   cancelButtonText: i18n.t('cancel'),
+          //   hideWhenScrolling: true,
+          //   obscureBackground: true,
+          // },
         }}
       />
 

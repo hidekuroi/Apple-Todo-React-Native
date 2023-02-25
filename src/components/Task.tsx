@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons"
 import React, { FC, useEffect, useState } from "react"
-import { KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from "react-native"
+import { KeyboardAvoidingView, Platform, Pressable, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { ColorsType } from "../themes/colors"
 import { TasksType, UpdateTaskModel } from "../types/common"
 import * as Haptics from "expo-haptics"
@@ -14,19 +14,26 @@ type Props = {
   btnColor: string
   colors: ColorsType
   isCreatingTask?: boolean
+  inputAccessoryID?: string
   taskInfoHandler?: (task: TasksType) => void
+  handleChange?: (task: UpdateTaskModel, todolistId: string, id: string) => void
+  handleDelete?: (todolistId: string, id: string) => void
+  handleCreate?: (todolistId: string, title: string) => void
 }
 
-const Task: FC<Props> = ({
+const Task: FC<Props> = React.memo(({
   task,
   index,
   colors,
   btnColor,
   isCreatingTask = false,
   listId,
-  taskInfoHandler
+  taskInfoHandler,
+  inputAccessoryID,
+  handleChange,
+  handleDelete,
+  handleCreate
 }) => {
-  const dispatch = useAppDispatch()
   const [taskData, setTaskData] = useState<TasksType>(
     task
       ? task
@@ -74,7 +81,7 @@ const Task: FC<Props> = ({
         ...taskData,
         status: status ? 0 : 1,
       }
-      dispatch(changeTask(taskData.todoListId, taskData.id, updatedTask))
+      handleChange && handleChange(updatedTask, taskData.todoListId, taskData.id)
     }
   }
  //? lmao are you an idiot?
@@ -82,20 +89,22 @@ const Task: FC<Props> = ({
     setIsFocused(false)
     if (!isCreating) {
       if (taskTitle !== taskData.title) {
-        if (taskTitle.trim().length) {
+        if (taskTitle.trim().length && handleChange) {
           const updatedTask: UpdateTaskModel = {
             ...taskData,
             title: taskTitle,
           }
-          dispatch(changeTask(taskData.todoListId, taskData.id, updatedTask))
+          handleChange(updatedTask, taskData.todoListId, taskData.id)
+          
+          
         } else {
-          dispatch(deleteTask(taskData.todoListId, taskData.id))
+          handleDelete && handleDelete(taskData.todoListId, taskData.id)
           setVisible(false)
         }
       }
     } else {
-      if (taskTitle) {
-        dispatch(createTask(listId, taskTitle)).then((data) => {
+      if (taskTitle && handleCreate) {
+        handleCreate(listId, taskTitle).then((data) => {
           if (data?.item) {
             console.log(data)
             setTaskData(data?.item)
@@ -172,6 +181,7 @@ const Task: FC<Props> = ({
             spellCheck={false}
             maxLength={100}
             keyboardType={'default'}
+            inputAccessoryViewID={inputAccessoryID}
             
             multiline
             style={{
@@ -183,13 +193,16 @@ const Task: FC<Props> = ({
           />
           {task?.description && <Text style={{color: colors.disabledText, marginTop: 2}}>{task.description}</Text>}
           </View>
-          {isFocused && <Pressable onPress={handleInfo}><Ionicons size={30} color={btnColor} name="information-circle-outline" /></Pressable>}
+          <View style={{flexDirection: 'row'}}>
+              {task?.priority === 2 && <Pressable style={{paddingHorizontal: 10}}><Ionicons size={20} color={'#FF9900'} name="flag" /></Pressable>}
+              {isFocused && <TouchableOpacity onPress={handleInfo}><Ionicons size={28} color={btnColor} name="information-circle-outline" /></TouchableOpacity>}
+          </View>
         </View>
       </View>
     </View>
   ) : (
     <View style={{ display: "none" }}></View>
   )
-}
+})
 
 export default Task

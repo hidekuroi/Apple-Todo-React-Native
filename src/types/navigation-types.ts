@@ -28,7 +28,7 @@ export type TaskInfoParamList = {
     taskId?: string,
     task?: TasksType
   }
-  TaskDetails: undefined
+  TaskDetails: {onFlag: (isFlagged: boolean) => void, isFlagged?: boolean}
   SelectList: {todoData: Array<TodoType>, cloudSettings: any, isEditTask?: boolean}
 }
 

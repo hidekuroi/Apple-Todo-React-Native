@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import React, { FC, useEffect, useState } from "react"
 import { Button, ScrollView, View } from "react-native"
 import Card from "../../components/Card"
+import TaskDetailsComponent from "../../components/TaskDetailsComponent"
 import { useLocale } from "../../hooks/useLocale"
 import { useMyTheme } from "../../hooks/useMyTheme"
 import { TaskInfoParamList } from "../../types/navigation-types"
@@ -11,8 +12,9 @@ type TaskDetailsModalProps = NativeStackScreenProps<
   "TaskDetails"
 >
 
-const TaskDetails: FC<TaskDetailsModalProps> = ({ navigation }) => {
+const TaskDetails: FC<TaskDetailsModalProps> = ({ navigation, route }) => {
   const { colors } = useMyTheme()
+  const routeProps = route.params
   const i18n = useLocale()
   const [isFlagged, setIsFlagged] = useState<boolean>(false)
 
@@ -31,25 +33,9 @@ const TaskDetails: FC<TaskDetailsModalProps> = ({ navigation }) => {
       style={{ backgroundColor: colors.modalBackground }}
     >
       <View
-        style={{ justifyContent: "center", alignItems: "center", marginTop: 7 }}
+        style={{ marginTop: 7 }}
       >
-        <Card isModalCard>
-          <Card.Item
-            text={i18n.t('tags')}
-            disabled
-            chevron
-            icon={{ iconName: "code-slash", shape: "square", color: "gray" }}
-          />
-        </Card>
-        <Card isModalCard>
-          <Card.Item
-            text={i18n.t('flag')}
-            disabled
-            switchValue={isFlagged}
-            onSwitch={() => setIsFlagged(!isFlagged)}
-            icon={{ iconName: "flag", shape: "square", color: "orange" }}
-          />
-        </Card>
+        <TaskDetailsComponent isFlagged={routeProps.isFlagged} onFlag={routeProps.onFlag}/>
       </View>
     </ScrollView>
   )
